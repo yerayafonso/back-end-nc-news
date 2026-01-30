@@ -575,6 +575,162 @@ describe("seed", () => {
         });
     });
   });
+  describe("emoji table", () => {
+    test("emoji table exists", () => {
+      return db
+        .query(
+          `SELECT EXISTS (
+            SELECT FROM 
+                information_schema.tables 
+            WHERE 
+                table_name = 'emojis'
+            );`,
+        )
+        .then(({ rows: [{ exists }] }) => {
+          expect(exists).toBe(true);
+        });
+    });
+
+    test("emoji table has emoji_id column as serial", () => {
+      return db
+        .query(
+          `SELECT *
+            FROM information_schema.columns
+            WHERE table_name = 'emojis'
+            AND column_name = 'emoji_id';`,
+        )
+        .then(({ rows: [column] }) => {
+          expect(column.column_name).toBe("emoji_id");
+          expect(column.data_type).toBe("integer");
+
+          expect(column.column_default).toBe(
+            "nextval('emojis_emoji_id_seq'::regclass)",
+          );
+        });
+    });
+
+    test("emojis table has emoji_id column as the primary key", () => {
+      return db
+        .query(
+          `SELECT column_name
+            FROM information_schema.table_constraints AS tc
+            JOIN information_schema.key_column_usage AS kcu
+            ON tc.constraint_name = kcu.constraint_name
+            WHERE tc.constraint_type = 'PRIMARY KEY'
+            AND tc.table_name = 'emojis';`,
+        )
+        .then(({ rows: [{ column_name }] }) => {
+          expect(column_name).toBe("emoji_id");
+        });
+    });
+
+    test("emojis table has emoji_name column as varying character", () => {
+      return db
+        .query(
+          `SELECT column_name, data_type, column_default
+            FROM information_schema.columns
+            WHERE table_name = 'emojis'
+            AND column_name = 'emoji_name';`,
+        )
+        .then(({ rows: [column] }) => {
+          expect(column.column_name).toBe("emoji_name");
+          expect(column.data_type).toBe("character varying");
+        });
+    });
+
+    test("emojis table has emoticon column of varying character of max length 8", () => {
+      return db
+        .query(
+          `SELECT column_name, data_type, character_maximum_length
+            FROM information_schema.columns
+            WHERE table_name = 'emojis'
+            AND column_name = 'emoticon';`,
+        )
+        .then(({ rows: [column] }) => {
+          expect(column.column_name).toBe("emoticon");
+          expect(column.data_type).toBe("character varying");
+          expect(column.character_maximum_length).toBe(8);
+        });
+    });
+  });
+  describe("emoji table", () => {
+    test("emoji table exists", () => {
+      return db
+        .query(
+          `SELECT EXISTS (
+            SELECT FROM 
+                information_schema.tables 
+            WHERE 
+                table_name = 'emojis'
+            );`,
+        )
+        .then(({ rows: [{ exists }] }) => {
+          expect(exists).toBe(true);
+        });
+    });
+
+    test("emoji table has emoji_id column as serial", () => {
+      return db
+        .query(
+          `SELECT *
+            FROM information_schema.columns
+            WHERE table_name = 'emojis'
+            AND column_name = 'emoji_id';`,
+        )
+        .then(({ rows: [column] }) => {
+          expect(column.column_name).toBe("emoji_id");
+          expect(column.data_type).toBe("integer");
+
+          expect(column.column_default).toBe(
+            "nextval('emojis_emoji_id_seq'::regclass)",
+          );
+        });
+    });
+
+    test("emojis table has emoji_id column as the primary key", () => {
+      return db
+        .query(
+          `SELECT column_name
+            FROM information_schema.table_constraints AS tc
+            JOIN information_schema.key_column_usage AS kcu
+            ON tc.constraint_name = kcu.constraint_name
+            WHERE tc.constraint_type = 'PRIMARY KEY'
+            AND tc.table_name = 'emojis';`,
+        )
+        .then(({ rows: [{ column_name }] }) => {
+          expect(column_name).toBe("emoji_id");
+        });
+    });
+
+    test("emojis table has emoji_name column as varying character", () => {
+      return db
+        .query(
+          `SELECT column_name, data_type, column_default
+            FROM information_schema.columns
+            WHERE table_name = 'emojis'
+            AND column_name = 'emoji_name';`,
+        )
+        .then(({ rows: [column] }) => {
+          expect(column.column_name).toBe("emoji_name");
+          expect(column.data_type).toBe("character varying");
+        });
+    });
+
+    test("emojis table has emoticon column of varying character of max length 8", () => {
+      return db
+        .query(
+          `SELECT column_name, data_type, character_maximum_length
+            FROM information_schema.columns
+            WHERE table_name = 'emojis'
+            AND column_name = 'emoticon';`,
+        )
+        .then(({ rows: [column] }) => {
+          expect(column.column_name).toBe("emoticon");
+          expect(column.data_type).toBe("character varying");
+          expect(column.character_maximum_length).toBe(8);
+        });
+    });
+  });
 });
 
 describe("data insertion", () => {
@@ -626,6 +782,17 @@ describe("data insertion", () => {
         expect(comment).toHaveProperty("author");
         expect(comment).toHaveProperty("votes");
         expect(comment).toHaveProperty("created_at");
+      });
+    });
+  });
+
+  test("emoji data has been inserted correctly", () => {
+    return db.query(`SELECT * FROM emojis;`).then(({ rows: emojis }) => {
+      expect(emojis).toHaveLength(16);
+      emojis.forEach((emojis) => {
+        expect(emojis).toHaveProperty("emoji_id");
+        expect(emojis).toHaveProperty("emoji_name");
+        expect(emojis).toHaveProperty("emoticon");
       });
     });
   });

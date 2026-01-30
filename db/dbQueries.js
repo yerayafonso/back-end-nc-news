@@ -21,6 +21,12 @@ const db = require("./connection");
 // );
 
 // Get all of the comments that have more than 10 votes.
-db.query(`SELECT * FROM comments WHERE votes>10`).then((res) =>
-  console.log(res.rows),
-);
+// db.query(`SELECT * FROM comments WHERE votes>10`).then((res) =>
+//   console.log(res.rows),
+// );
+
+// Get all of the emojis.
+// db.query(`SELECT * FROM emojis `).then((res) => console.log(res.rows));
+
+//Get all article titles
+db.query(`SELECT title FROM articles`).then((res) => console.log(res.rows));

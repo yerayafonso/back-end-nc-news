@@ -1,10 +1,23 @@
 const db = require("../connection");
 const format = require("pg-format");
-const { createRef, updateComments } = require("./utils.js");
+const { createRef } = require("./utils.js");
 
-const seed = ({ topicData, userData, articleData, commentData }) => {
+const seed = ({
+  topicData,
+  userData,
+  articleData,
+  commentData,
+  emojiData,
+  reactionData,
+}) => {
   return db
-    .query(`DROP TABLE IF EXISTS comments`)
+    .query(`DROP TABLE IF EXISTS article_emoji_reactions`)
+    .then(() => {
+      return db.query(`DROP TABLE IF EXISTS emojis`);
+    })
+    .then(() => {
+      return db.query(`DROP TABLE IF EXISTS comments`);
+    })
     .then(() => {
       return db.query(`DROP TABLE IF EXISTS articles`);
     })
@@ -58,6 +71,25 @@ const seed = ({ topicData, userData, articleData, commentData }) => {
       );
     })
     .then(() => {
+      return db.query(
+        `CREATE TABLE emojis (
+      emoji_id SERIAL PRIMARY KEY,
+      emoji_name VARCHAR,
+      emoticon VARCHAR(8)
+      )`,
+      );
+    })
+    .then(() => {
+      return db.query(
+        `CREATE TABLE article_emoji_reactions (
+      article_emoji_reactions_id SERIAL PRIMARY KEY,
+      username VARCHAR REFERENCES users(username), 
+      article_id INT REFERENCES articles(article_id),
+      emoji_id INT REFERENCES emojis(emoji_id)
+      )`,
+      );
+    })
+    .then(() => {
       const formattedTopics = topicData.map((topic) => [
         topic.slug,
         topic.description,
@@ -103,17 +135,13 @@ const seed = ({ topicData, userData, articleData, commentData }) => {
     .then(({ rows }) => {
       const ref = createRef(rows, "title", "article_id");
 
-      const updatedComments = updateComments(commentData, ref);
-
-      const formattedComments = updatedComments.map(
-        ({ article_id, body, votes, author, created_at }) => [
-          article_id,
-          body,
-          votes,
-          author,
-          created_at,
-        ],
-      );
+      const formattedComments = commentData.map((comment) => [
+        ref[comment.article_title],
+        comment.body,
+        comment.votes,
+        comment.author,
+        comment.created_at,
+      ]);
 
       return db.query(
         format(
@@ -121,6 +149,34 @@ const seed = ({ topicData, userData, articleData, commentData }) => {
           formattedComments,
         ),
       );
+    })
+    .then(() => {
+      const formattedEmojis = emojiData.map((emoji) => [
+        emoji.emoji_name,
+        emoji.emoticon,
+      ]);
+      return db.query(
+        format(
+          `INSERT INTO emojis(emoji_name, emoticon) VALUES %L RETURNING *`,
+          formattedEmojis,
+        ),
+      );
     });
+  // .then(({ rows }) => {
+  //   const ref = createRef(rows, "emoticon", "emoji_id");
+  //   console.log(ref);
+
+  //   const formattedReactions = reactionData.map((reaction) => [
+  //     reaction.username,
+  //     ref[reaction.title],
+  //     reaction.emoji_id,
+  //   ]);
+  //   return db.query(
+  //     format(
+  //       `INSERT INTO article_emoji_reactions(username, article_id, emoji_id) VALUES %L RETURNING *`,
+  //       formattedReactions,
+  //     ),
+  //   );
+  // });
 };
 module.exports = seed;

@@ -9,20 +9,20 @@ function createRef(dataCategory, property1, property2) {
   return mappedObj;
 }
 
-function updateComments(commentsData, changedKeysObject) {
-  let formattedComments = [];
-  for (let comment of commentsData) {
-    let newObject = {};
-    for (let key in comment) {
-      if (key === "article_title") {
-        newObject.article_id = changedKeysObject[comment[key]];
-      } else {
-        newObject[key] = comment[key];
-      }
-    }
-    formattedComments.push(newObject);
-  }
-  return formattedComments;
-}
+// function updateObject(dataCategory, changedKeysObject) {
+//   let formattedObject = [];
+//   for (let data of dataCategory) {
+//     let newObject = {};
+//     for (let key in data) {
+//       if (key === "article_title") {
+//         newObject.article_id = changedKeysObject[data[key]];
+//       } else {
+//         newObject[key] = data[key];
+//       }
+//     }
+//     formattedObject.push(newObject);
+//   }
+//   return formattedObject;
+// }
 
-module.exports = { createRef, updateComments };
+module.exports = { createRef };
