@@ -731,6 +731,204 @@ describe("seed", () => {
         });
     });
   });
+  describe("article emoji reactions table", () => {
+    test("article_emoji_reactions table exists", () => {
+      return db
+        .query(
+          `SELECT EXISTS (
+            SELECT FROM 
+                information_schema.tables 
+            WHERE 
+                table_name = 'article_emoji_reactions'
+            );`,
+        )
+        .then(({ rows: [{ exists }] }) => {
+          expect(exists).toBe(true);
+        });
+    });
+
+    test("article_emoji_reactions table has article_emoji_reactions_id column as serial", () => {
+      return db
+        .query(
+          `SELECT column_name, data_type, column_default
+            FROM information_schema.columns
+            WHERE table_name = 'article_emoji_reactions'
+            AND column_name = 'article_emoji_reactions_id';`,
+        )
+        .then(({ rows: [column] }) => {
+          expect(column.column_name).toBe("article_emoji_reactions_id");
+          expect(column.data_type).toBe("integer");
+          expect(column.column_default).toBe(
+            "nextval('article_emoji_reactions_article_emoji_reactions_id_seq'::regclass)",
+          );
+        });
+    });
+
+    test("article_emoji_reactions table has article_emoji_reactions_id column as the primary key", () => {
+      return db
+        .query(
+          `SELECT column_name
+            FROM information_schema.table_constraints AS tc
+            JOIN information_schema.key_column_usage AS kcu
+            ON tc.constraint_name = kcu.constraint_name
+            WHERE tc.constraint_type = 'PRIMARY KEY'
+            AND tc.table_name = 'article_emoji_reactions';`,
+        )
+        .then(({ rows: [{ column_name }] }) => {
+          expect(column_name).toBe("article_emoji_reactions_id");
+        });
+    });
+
+    test("article_emoji_reactions table has username column as varying character", () => {
+      return db
+        .query(
+          `SELECT column_name, data_type
+            FROM information_schema.columns
+            WHERE table_name = 'article_emoji_reactions'
+            AND column_name = 'username';`,
+        )
+        .then(({ rows: [column] }) => {
+          expect(column.column_name).toBe("username");
+          expect(column.data_type).toBe("character varying");
+        });
+    });
+
+    test("username column has NOT NULL constraint", () => {
+      return db
+        .query(
+          `
+        SELECT is_nullable
+        FROM information_schema.columns
+        WHERE table_name = 'article_emoji_reactions'
+        AND column_name = 'username';`,
+        )
+        .then(({ rows: [{ is_nullable }] }) => {
+          expect(is_nullable).toBe("NO");
+        });
+    });
+
+    test("username column references an username from the users table", () => {
+      return db
+        .query(
+          `
+        SELECT *
+        FROM information_schema.table_constraints AS tc
+        JOIN information_schema.key_column_usage AS kcu
+          ON tc.constraint_name = kcu.constraint_name
+        JOIN information_schema.constraint_column_usage AS ccu
+          ON ccu.constraint_name = tc.constraint_name
+        WHERE tc.constraint_type = 'FOREIGN KEY'
+          AND tc.table_name = 'article_emoji_reactions'
+          AND kcu.column_name = 'username'
+          AND ccu.table_name = 'users'
+          AND ccu.column_name = 'username';
+      `,
+        )
+        .then(({ rows }) => {
+          expect(rows).toHaveLength(1);
+        });
+    });
+
+    test("article_emoji_reactions table has article_id column as integer", () => {
+      return db
+        .query(
+          `SELECT column_name, data_type
+            FROM information_schema.columns
+            WHERE table_name = 'article_emoji_reactions'
+            AND column_name = 'article_id';`,
+        )
+        .then(({ rows: [column] }) => {
+          expect(column.column_name).toBe("article_id");
+          expect(column.data_type).toBe("integer");
+        });
+    });
+
+    test("article_id column has NOT NULL constraint", () => {
+      return db
+        .query(
+          `
+        SELECT is_nullable
+        FROM information_schema.columns
+        WHERE table_name = 'article_emoji_reactions'
+        AND column_name = 'article_id';`,
+        )
+        .then(({ rows: [{ is_nullable }] }) => {
+          expect(is_nullable).toBe("NO");
+        });
+    });
+
+    test("article_id column references an article from the articles table", () => {
+      return db
+        .query(
+          `
+        SELECT *
+        FROM information_schema.table_constraints AS tc
+        JOIN information_schema.key_column_usage AS kcu
+          ON tc.constraint_name = kcu.constraint_name
+        JOIN information_schema.constraint_column_usage AS ccu
+          ON ccu.constraint_name = tc.constraint_name
+        WHERE tc.constraint_type = 'FOREIGN KEY'
+          AND tc.table_name = 'article_emoji_reactions'
+          AND kcu.column_name = 'article_id'
+          AND ccu.table_name = 'articles'
+          AND ccu.column_name = 'article_id';
+      `,
+        )
+        .then(({ rows }) => {
+          expect(rows).toHaveLength(1);
+        });
+    });
+
+    test("article_emoji_reactions table has emoji_id column as integer", () => {
+      return db
+        .query(
+          `SELECT column_name, data_type
+            FROM information_schema.columns
+            WHERE table_name = 'article_emoji_reactions'
+            AND column_name = 'emoji_id';`,
+        )
+        .then(({ rows: [column] }) => {
+          expect(column.column_name).toBe("emoji_id");
+          expect(column.data_type).toBe("integer");
+        });
+    });
+
+    test("emoji_id column has NOT NULL constraint", () => {
+      return db
+        .query(
+          `
+        SELECT is_nullable
+        FROM information_schema.columns
+        WHERE table_name = 'article_emoji_reactions'
+        AND column_name = 'emoji_id';`,
+        )
+        .then(({ rows: [{ is_nullable }] }) => {
+          expect(is_nullable).toBe("NO");
+        });
+    });
+
+    test("emoji_id column references an emoticon from the emojis table", () => {
+      return db
+        .query(
+          `
+        SELECT *
+        FROM information_schema.table_constraints AS tc
+        JOIN information_schema.key_column_usage AS kcu
+          ON tc.constraint_name = kcu.constraint_name
+        JOIN information_schema.constraint_column_usage AS ccu
+          ON ccu.constraint_name = tc.constraint_name
+        WHERE tc.constraint_type = 'FOREIGN KEY'
+          AND tc.table_name = 'article_emoji_reactions'
+          AND kcu.column_name = 'emoji_id'
+          AND ccu.table_name = 'emojis'
+          AND ccu.column_name = 'emoji_id';
+      `,
+        )
+        .then(({ rows }) => {
+          expect(rows).toHaveLength(1);
+        });
+    });
+  });
 });
 
 describe("data insertion", () => {
@@ -795,5 +993,18 @@ describe("data insertion", () => {
         expect(emojis).toHaveProperty("emoticon");
       });
     });
+  });
+  test("emoji reaction data has been inserted correctly", () => {
+    return db
+      .query(`SELECT * FROM article_emoji_reactions;`)
+      .then(({ rows: article_emoji_reactions }) => {
+        expect(article_emoji_reactions).toHaveLength(13);
+        article_emoji_reactions.forEach((reaction) => {
+          expect(reaction).toHaveProperty("article_emoji_reactions_id");
+          expect(reaction).toHaveProperty("username");
+          expect(reaction).toHaveProperty("article_id");
+          expect(reaction).toHaveProperty("emoji_id");
+        });
+      });
   });
 });
