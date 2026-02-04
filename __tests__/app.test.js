@@ -47,6 +47,9 @@ describe("/api/articles", () => {
           expect(article).toHaveProperty("comment_count");
           expect(typeof article.comment_count).toBe("number");
         });
+        expect(
+          Date.parse(body[0].created_at) > Date.parse(body[1].created_at),
+        ).toBe(true);
       });
   });
 
@@ -70,6 +73,49 @@ describe("/api/articles", () => {
         expect(typeof body.votes).toBe("number");
         expect(body).toHaveProperty("article_img_url");
         expect(typeof body.article_img_url).toBe("string");
+      });
+  });
+
+  test("GET 404 - Responds with error message", () => {
+    return request(app)
+      .get("/api/articles/50")
+      .expect(404)
+      .then(({ body }) => {
+        expect(body).toEqual({ msg: "Sorry, that article does not exist" });
+      });
+  });
+
+  test("GET 200 - Responds with array of article objects", () => {
+    return request(app)
+      .get("/api/articles/1/comments")
+      .expect(200)
+      .then(({ body }) => {
+        body.forEach((comment) => {
+          expect(comment).toHaveProperty("comment_id");
+          expect(typeof comment.comment_id).toBe("number");
+          expect(comment).toHaveProperty("votes");
+          expect(typeof comment.votes).toBe("number");
+          expect(comment).toHaveProperty("created_at");
+          expect(typeof comment.created_at).toBe("string");
+          expect(comment).toHaveProperty("author");
+          expect(typeof comment.author).toBe("string");
+          expect(comment).toHaveProperty("body");
+          expect(typeof comment.body).toBe("string");
+          expect(comment).toHaveProperty("article_id");
+          expect(typeof comment.article_id).toBe("number");
+        });
+        expect(
+          Date.parse(body[0].created_at) > Date.parse(body[1].created_at),
+        ).toBe(true);
+      });
+  });
+
+  test("GET 404 - Responds with error message", () => {
+    return request(app)
+      .get("/api/articles/50/comments")
+      .expect(404)
+      .then(({ body }) => {
+        expect(body).toEqual({ msg: "Sorry, that article does not exist" });
       });
   });
 });
