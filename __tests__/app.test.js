@@ -45,7 +45,7 @@ describe("/api/articles", () => {
           expect(article).toHaveProperty("article_img_url");
           expect(typeof article.article_img_url).toBe("string");
           expect(article).toHaveProperty("comment_count");
-          expect(typeof article.comment_count).toBe("string");
+          expect(typeof article.comment_count).toBe("number");
         });
       });
   });
