@@ -49,6 +49,29 @@ describe("/api/articles", () => {
         });
       });
   });
+
+  test("GET 200 - Responds with single article object", () => {
+    return request(app)
+      .get("/api/articles/1")
+      .expect(200)
+      .then(({ body }) => {
+        expect(body).toHaveProperty("author");
+        expect(typeof body.author).toBe("string");
+        expect(body).toHaveProperty("title");
+        expect(typeof body.title).toBe("string");
+        expect(body).toHaveProperty("article_id");
+        expect(body.article_id).toBe(1);
+        expect(typeof body.article_id).toBe("number");
+        expect(body).toHaveProperty("topic");
+        expect(typeof body.topic).toBe("string");
+        expect(body).toHaveProperty("created_at");
+        expect(typeof body.created_at).toBe("string");
+        expect(body).toHaveProperty("votes");
+        expect(typeof body.votes).toBe("number");
+        expect(body).toHaveProperty("article_img_url");
+        expect(typeof body.article_img_url).toBe("string");
+      });
+  });
 });
 
 describe("/api/users", () => {
