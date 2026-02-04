@@ -41,6 +41,7 @@ module.exports = [
     username: "tickle122",
     title:
       "An Introduction to JavaScript Object Notation (JSON) in JavaScript and .NET",
+    emoticon: "😮‍💨",
   },
   {
     username: "happyamy2016",
@@ -114,7 +115,11 @@ module.exports = [
     title: "HOW COOKING HAS CHANGED US",
     emoticon: "😋",
   },
-  { username: "tickle122", title: "Thanksgiving Drinks for Everyone" },
+  {
+    username: "tickle122",
+    title: "Thanksgiving Drinks for Everyone",
+    emoticon: "🫡",
+  },
   { username: "jessjelly", title: "High Altitude Cooking", emoticon: "😋" },
   {
     username: "tickle122",
@@ -133,7 +138,11 @@ module.exports = [
     title: "Halal food: Keeping pure and true",
     emoticon: "🤤",
   },
-  { username: "tickle122", title: "Seafood substitutions are increasing" },
+  {
+    username: "tickle122",
+    title: "Seafood substitutions are increasing",
+    emoticon: "😋",
+  },
   {
     username: "weegembump",
     title: "The Notorious MSG’s Unlikely Formula For Success",
