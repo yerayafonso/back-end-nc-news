@@ -7,6 +7,17 @@ const app = require("../app");
 beforeAll(() => seed(data));
 afterAll(() => db.end());
 
+describe("Invalid endpoint", () => {
+  test("404: Responds with a message when path is not found", () => {
+    return request(app)
+      .get("/api/invalid-path")
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Path not found");
+      });
+  });
+});
+
 describe("/api/topics", () => {
   test("GET 200 - Responds with array of topic objects", () => {
     return request(app)
@@ -42,7 +53,9 @@ describe("/api/articles", () => {
         ).toBe(true);
       });
   });
+});
 
+describe("/api/articles/:article_id", () => {
   test("GET 200 - Responds with single article object", () => {
     return request(app)
       .get("/api/articles/1")
@@ -94,6 +107,16 @@ describe("/api/articles", () => {
       .then(({ body }) => {
         expect(body).toEqual({ msg: "ID not found" });
       });
+  });
+  describe("Invalid Methods", () => {
+    test("405: Responds with message", () => {
+      return request(app)
+        .delete("/api/articles/2")
+        .expect(405)
+        .then(({ body }) => {
+          expect(body.msg).toBe("Method not allowed");
+        });
+    });
   });
 });
 

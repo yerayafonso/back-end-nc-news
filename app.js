@@ -9,11 +9,21 @@ const topicsRouter = require("./routes/topics.routes");
 const articlesRouter = require("./routes/articles.routes");
 const usersRouter = require("./routes/users.routes");
 
+//Valid Paths
+
 app.use("/api/topics", topicsRouter);
 
 app.use("/api/articles", articlesRouter);
 
 app.use("/api/users", usersRouter);
+
+// Invalid Path catch all
+
+app.all("/*path", (req, res, next) => {
+  res.status(404).send({ msg: "Path not found" });
+});
+
+// Error Handling Middleware Functions
 
 app.use((err, req, res, next) => {
   if (err instanceof NotFoundError) {
@@ -21,6 +31,10 @@ app.use((err, req, res, next) => {
   } else {
     next(err);
   }
+});
+
+app.use((err, req, res, next) => {
+  res.status(500).send({ msg: "Internal Server Error" });
 });
 
 module.exports = app;
