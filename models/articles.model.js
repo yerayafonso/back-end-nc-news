@@ -68,3 +68,14 @@ exports.postNewArticleByIdComments = (article_id, username, body) => {
     )
     .then(({ rows }) => rows[0]);
 };
+
+exports.patchArticlePropertyById = (article_id, inc_votes) => {
+  return db
+    .query(
+      `UPDATE articles SET votes = votes + $2
+     WHERE article_id = $1
+      RETURNING *;`,
+      [article_id, inc_votes],
+    )
+    .then(({ rows }) => rows[0]);
+};

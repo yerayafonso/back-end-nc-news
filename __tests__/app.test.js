@@ -110,7 +110,7 @@ describe("/api/articles/:article_id", () => {
   });
   describe("Invalid Methods", () => {
     test("405: Responds with message", () => {
-      const invalidMethods = ["delete", "post", "patch"];
+      const invalidMethods = ["delete", "post"];
 
       const requests = invalidMethods.map((method) => {
         return request(app)
@@ -150,6 +150,37 @@ describe("/api/articles/:article_id", () => {
         .send({
           username: "butter_bridge",
           body: "Random text",
+        })
+        .expect(404)
+        .then(({ body }) => {
+          expect(body.msg).toBe("ID not found");
+        });
+    });
+  });
+
+  describe("PATCH /api/articles/:article_id", () => {
+    test("200: Responds with the updated article object", async () => {
+      const currentVotes = await db.query(
+        `SELECT votes FROM articles WHERE article_id=3`,
+      );
+
+      return request(app)
+        .patch("/api/articles/3")
+        .send({
+          inc_votes: 35,
+        })
+        .expect(200)
+        .then(({ body }) => {
+          expect(body.votes).toBeNumber();
+          expect(body.votes).toBe(currentVotes.rows[0].votes + 35);
+        });
+    });
+
+    test("404: Responds with error message", () => {
+      return request(app)
+        .patch("/api/articles/20")
+        .send({
+          inc_votes: 35,
         })
         .expect(404)
         .then(({ body }) => {

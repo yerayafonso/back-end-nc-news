@@ -3,6 +3,7 @@ const {
   getArticleById: getArticleByIdService,
   getArticleByIdComments: getArticleByIdCommentsService,
   postArticleByIdComments: postArticleByIdCommentsService,
+  patchArticleById: patchArticleByIdService,
 } = require("../service/articles.service");
 
 exports.getAllArticles = (req, res) => {
@@ -49,14 +50,15 @@ exports.postArticleByIdComments = (req, res, next) => {
     });
 };
 
-// exports.getArticleByIdComments = (req, res) => {
-//   const { article_id } = req.params;
+exports.patchArticleById = (req, res, next) => {
+  const { article_id } = req.params;
+  const { inc_votes } = req.body;
 
-//   getArticleByIdCommentsService(article_id).then((comments) => {
-//     if (comments.length !== 0) {
-//       res.status(200).send(comments);
-//     } else {
-//       res.status(404).send({ msg: "Sorry, that article does not exist" });
-//     }
-//   });
-// };
+  patchArticleByIdService(article_id, inc_votes)
+    .then((article) => {
+      res.status(200).send(article);
+    })
+    .catch((err) => {
+      next(err);
+    });
+};

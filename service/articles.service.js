@@ -3,6 +3,7 @@ const {
   fetchArticleById,
   fetchArticleByIdComments,
   postNewArticleByIdComments,
+  patchArticlePropertyById,
 } = require("../models/articles.model");
 const NotFoundError = require("../errors/NotFoundError");
 
@@ -37,6 +38,20 @@ exports.postArticleByIdComments = (article_id, username, body) => {
         throw new NotFoundError("ID not found");
       } else {
         return comments;
+      }
+    })
+    .catch((err) => {
+      throw new NotFoundError("ID not found");
+    });
+};
+
+exports.patchArticleById = (article_id, inc_votes) => {
+  return patchArticlePropertyById(article_id, inc_votes)
+    .then((article) => {
+      if (!article) {
+        throw new NotFoundError("ID not found");
+      } else {
+        return article;
       }
     })
     .catch((err) => {
