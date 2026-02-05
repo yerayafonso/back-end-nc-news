@@ -110,12 +110,18 @@ describe("/api/articles/:article_id", () => {
   });
   describe("Invalid Methods", () => {
     test("405: Responds with message", () => {
-      return request(app)
-        .delete("/api/articles/2")
-        .expect(405)
-        .then(({ body }) => {
-          expect(body.msg).toBe("Method not allowed");
-        });
+      const invalidMethods = ["delete", "post", "patch"];
+
+      const requests = invalidMethods.map((method) => {
+        return request(app)
+          [method]("/api/articles/2")
+          .expect(405)
+          .then(({ body }) => {
+            expect(body.msg).toBe("Method not allowed");
+          });
+      });
+
+      return Promise.all(requests);
     });
   });
 });

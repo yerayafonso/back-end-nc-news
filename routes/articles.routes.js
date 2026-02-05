@@ -5,16 +5,19 @@ const {
   getArticleByIdComments,
   postArticleByIdComments,
 } = require("../controllers/articles.controller");
+const handleInvalidMethods = require("../errors/handleInvalidMethods");
 
 const articlesRouter = express.Router();
 
 articlesRouter.get("/", getAllArticles);
 
-articlesRouter.get("/:article_id", getArticleById);
+articlesRouter
+  .route("/:article_id")
+  .get(getArticleById)
+  .all(handleInvalidMethods);
+
 articlesRouter.get("/:article_id/comments", getArticleByIdComments);
-articlesRouter.delete("/:article_id", (req, res, next) => {
-  res.status(405).send({ msg: "Method not allowed" });
-});
+
 // articlesRouter.post("/:article_id/comments", postArticleByIdComments);
 
 module.exports = articlesRouter;
