@@ -14,10 +14,8 @@ describe("/api/topics", () => {
       .expect(200)
       .then(({ body }) => {
         body.forEach((topic) => {
-          expect(topic).toHaveProperty("slug");
-          expect(typeof topic.slug).toBe("string");
-          expect(topic).toHaveProperty("description");
-          expect(typeof topic.description).toBe("string");
+          expect(topic.slug).toBeString();
+          expect(topic.description).toBeString();
         });
       });
   });
@@ -30,22 +28,14 @@ describe("/api/articles", () => {
       .expect(200)
       .then(({ body }) => {
         body.forEach((article) => {
-          expect(article).toHaveProperty("author");
-          expect(typeof article.author).toBe("string");
-          expect(article).toHaveProperty("title");
-          expect(typeof article.title).toBe("string");
-          expect(article).toHaveProperty("article_id");
-          expect(typeof article.article_id).toBe("number");
-          expect(article).toHaveProperty("topic");
-          expect(typeof article.topic).toBe("string");
-          expect(article).toHaveProperty("created_at");
-          expect(typeof article.created_at).toBe("string");
-          expect(article).toHaveProperty("votes");
-          expect(typeof article.votes).toBe("number");
-          expect(article).toHaveProperty("article_img_url");
-          expect(typeof article.article_img_url).toBe("string");
-          expect(article).toHaveProperty("comment_count");
-          expect(typeof article.comment_count).toBe("number");
+          expect(article.author).toBeString();
+          expect(article.title).toBeString();
+          expect(article.article_id).toBeNumber();
+          expect(article.topic).toBeString();
+          expect(article.created_at).toBeString();
+          expect(article.votes).toBeNumber();
+          expect(article.article_img_url).toBeString();
+          expect(article.comment_count).toBeNumber();
         });
         expect(
           Date.parse(body[0].created_at) > Date.parse(body[1].created_at),
@@ -58,21 +48,14 @@ describe("/api/articles", () => {
       .get("/api/articles/1")
       .expect(200)
       .then(({ body }) => {
-        expect(body).toHaveProperty("author");
-        expect(typeof body.author).toBe("string");
-        expect(body).toHaveProperty("title");
-        expect(typeof body.title).toBe("string");
-        expect(body).toHaveProperty("article_id");
+        expect(body.author).toBeString();
+        expect(body.title).toBeString();
         expect(body.article_id).toBe(1);
-        expect(typeof body.article_id).toBe("number");
-        expect(body).toHaveProperty("topic");
-        expect(typeof body.topic).toBe("string");
-        expect(body).toHaveProperty("created_at");
-        expect(typeof body.created_at).toBe("string");
-        expect(body).toHaveProperty("votes");
-        expect(typeof body.votes).toBe("number");
-        expect(body).toHaveProperty("article_img_url");
-        expect(typeof body.article_img_url).toBe("string");
+        expect(body.article_id).toBeNumber();
+        expect(body.topic).toBeString();
+        expect(body.created_at).toBeString();
+        expect(body.votes).toBeNumber();
+        expect(body.article_img_url).toBeString();
       });
   });
 
@@ -81,7 +64,7 @@ describe("/api/articles", () => {
       .get("/api/articles/50")
       .expect(404)
       .then(({ body }) => {
-        expect(body).toEqual({ msg: "Sorry, that article does not exist" });
+        expect(body).toEqual({ msg: "ID not found" });
       });
   });
 
@@ -91,18 +74,12 @@ describe("/api/articles", () => {
       .expect(200)
       .then(({ body }) => {
         body.forEach((comment) => {
-          expect(comment).toHaveProperty("comment_id");
-          expect(typeof comment.comment_id).toBe("number");
-          expect(comment).toHaveProperty("votes");
-          expect(typeof comment.votes).toBe("number");
-          expect(comment).toHaveProperty("created_at");
-          expect(typeof comment.created_at).toBe("string");
-          expect(comment).toHaveProperty("author");
-          expect(typeof comment.author).toBe("string");
-          expect(comment).toHaveProperty("body");
-          expect(typeof comment.body).toBe("string");
-          expect(comment).toHaveProperty("article_id");
-          expect(typeof comment.article_id).toBe("number");
+          expect(comment.comment_id).toBeNumber();
+          expect(comment.votes).toBeNumber();
+          expect(comment.created_at).toBeString();
+          expect(comment.author).toBeString();
+          expect(comment.body).toBeString();
+          expect(comment.article_id).toBeNumber();
         });
         expect(
           Date.parse(body[0].created_at) > Date.parse(body[1].created_at),
@@ -115,7 +92,7 @@ describe("/api/articles", () => {
       .get("/api/articles/50/comments")
       .expect(404)
       .then(({ body }) => {
-        expect(body).toEqual({ msg: "Sorry, that article does not exist" });
+        expect(body).toEqual({ msg: "ID not found" });
       });
   });
 });
@@ -127,12 +104,9 @@ describe("/api/users", () => {
       .expect(200)
       .then(({ body }) => {
         body.forEach((users) => {
-          expect(users).toHaveProperty("username");
-          expect(typeof users.username).toBe("string");
-          expect(users).toHaveProperty("name");
-          expect(typeof users.name).toBe("string");
-          expect(users).toHaveProperty("avatar_url");
-          expect(typeof users.avatar_url).toBe("string");
+          expect(users.username).toBeString();
+          expect(users.name).toBeString();
+          expect(users.avatar_url).toBeString();
         });
       });
   });
