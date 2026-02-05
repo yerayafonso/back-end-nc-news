@@ -18,6 +18,6 @@ articlesRouter
 
 articlesRouter.get("/:article_id/comments", getArticleByIdComments);
 
-// articlesRouter.post("/:article_id/comments", postArticleByIdComments);
+articlesRouter.post("/:article_id/comments", postArticleByIdComments);
 
 module.exports = articlesRouter;

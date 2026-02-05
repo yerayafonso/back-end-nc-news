@@ -2,6 +2,7 @@ const {
   fetchAllArticles,
   fetchArticleById,
   fetchArticleByIdComments,
+  postNewArticleByIdComments,
 } = require("../models/articles.model");
 const NotFoundError = require("../errors/NotFoundError");
 
@@ -27,4 +28,18 @@ exports.getArticleByIdComments = (article_id) => {
       return comments;
     }
   });
+};
+
+exports.postArticleByIdComments = (article_id, username, body) => {
+  return postNewArticleByIdComments(article_id, username, body)
+    .then((comments) => {
+      if (!comments) {
+        throw new NotFoundError("ID not found");
+      } else {
+        return comments;
+      }
+    })
+    .catch((err) => {
+      throw new NotFoundError("ID not found");
+    });
 };

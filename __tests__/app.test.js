@@ -124,6 +124,39 @@ describe("/api/articles/:article_id", () => {
       return Promise.all(requests);
     });
   });
+
+  describe("POST /api/articles/:article_id/comments", () => {
+    test("201: Responds with the new comment object", () => {
+      return request(app)
+        .post("/api/articles/3/comments")
+        .send({
+          username: "butter_bridge",
+          body: "Random text",
+        })
+        .expect(201)
+        .then(({ body }) => {
+          expect(body.comment_id).toBeNumber();
+          expect(body.votes).toBeNumber();
+          expect(body.created_at).toBeString();
+          expect(body.author).toBeString();
+          expect(body.body).toBeString();
+          expect(body.article_id).toBeNumber();
+        });
+    });
+
+    test("404: Responds with error message", () => {
+      return request(app)
+        .post("/api/articles/25/comments")
+        .send({
+          username: "butter_bridge",
+          body: "Random text",
+        })
+        .expect(404)
+        .then(({ body }) => {
+          expect(body.msg).toBe("ID not found");
+        });
+    });
+  });
 });
 
 describe("/api/users", () => {

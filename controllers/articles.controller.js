@@ -2,6 +2,7 @@ const {
   getAllArticles: getAllArticlesService,
   getArticleById: getArticleByIdService,
   getArticleByIdComments: getArticleByIdCommentsService,
+  postArticleByIdComments: postArticleByIdCommentsService,
 } = require("../service/articles.service");
 
 exports.getAllArticles = (req, res) => {
@@ -29,6 +30,19 @@ exports.getArticleByIdComments = (req, res, next) => {
   getArticleByIdCommentsService(article_id)
     .then((comments) => {
       res.status(200).send(comments);
+    })
+    .catch((err) => {
+      next(err);
+    });
+};
+
+exports.postArticleByIdComments = (req, res, next) => {
+  const { article_id } = req.params;
+  const { username, body } = req.body;
+
+  postArticleByIdCommentsService(article_id, username, body)
+    .then((comments) => {
+      res.status(201).send(comments);
     })
     .catch((err) => {
       next(err);
