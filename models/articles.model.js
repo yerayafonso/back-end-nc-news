@@ -1,6 +1,26 @@
 const db = require("../db/connection");
+const InvalidQuery = require("../errors/InvalidQuery");
 
-exports.fetchAllArticles = () => {
+exports.fetchAllArticles = (sort_by = "created_at", order = "DESC") => {
+  const validSortQuery = [
+    "author",
+    "title",
+    "article_id",
+    "topic",
+    "created_at",
+    "votes",
+    "avatar_img_url",
+  ];
+  const validOrderQuery = ["ASC", "DESC"];
+
+  if (!validSortQuery.includes(sort_by)) {
+    throw new InvalidQuery("Invalid Query");
+  }
+
+  if (!validOrderQuery.includes(order.toUpperCase())) {
+    throw new InvalidQuery("Invalid Query");
+  }
+
   return db
     .query(
       `SELECT 
@@ -16,7 +36,7 @@ exports.fetchAllArticles = () => {
       LEFT JOIN comments 
       ON articles.article_id = comments.article_id 
       GROUP BY articles.article_id
-      ORDER BY articles.created_at DESC;`,
+      ORDER BY articles.${sort_by} ${order.toUpperCase()};`,
     )
     .then(({ rows }) => rows);
 };
@@ -78,4 +98,10 @@ exports.patchArticlePropertyById = (article_id, inc_votes) => {
       [article_id, inc_votes],
     )
     .then(({ rows }) => rows[0]);
+};
+
+exports.checkArticleExists = (article_id) => {
+  return db
+    .query(`SELECT * FROM articles WHERE article_id = $1`, [article_id])
+    .then(({ rows }) => rows.length === 1);
 };

@@ -4,11 +4,12 @@ const {
   fetchArticleByIdComments,
   postNewArticleByIdComments,
   patchArticlePropertyById,
+  checkArticleExists,
 } = require("../models/articles.model");
 const NotFoundError = require("../errors/NotFoundError");
 
-exports.getAllArticles = () => {
-  return fetchAllArticles();
+exports.getAllArticles = (sort_by, order) => {
+  return fetchAllArticles(sort_by, order);
 };
 
 exports.getArticleById = (article_id) => {
@@ -22,11 +23,17 @@ exports.getArticleById = (article_id) => {
 };
 
 exports.getArticleByIdComments = (article_id) => {
-  return fetchArticleByIdComments(article_id).then((comments) => {
-    if (comments.length === 0) {
+  return checkArticleExists(article_id).then((articleExists) => {
+    if (!articleExists) {
       throw new NotFoundError("ID not found");
     } else {
-      return comments;
+      return fetchArticleByIdComments(article_id).then((comments) => {
+        if (comments.length === 0) {
+          throw new NotFoundError("Article doesn't have comments");
+        } else {
+          return comments;
+        }
+      });
     }
   });
 };

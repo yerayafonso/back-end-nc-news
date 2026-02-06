@@ -53,6 +53,36 @@ describe("/api/articles", () => {
         ).toBe(true);
       });
   });
+
+  test("GET 200 - Responds with array of article objects based on sort_by query", () => {
+    return request(app)
+      .get("/api/articles?sort_by=author")
+      .expect(200)
+      .then(({ body }) => {
+        body.forEach((article) => {
+          expect(article.author).toBeString();
+          expect(article.title).toBeString();
+          expect(article.article_id).toBeNumber();
+          expect(article.topic).toBeString();
+          expect(article.created_at).toBeString();
+          expect(article.votes).toBeNumber();
+          expect(article.article_img_url).toBeString();
+          expect(article.comment_count).toBeNumber();
+        });
+        expect(body[0].author >= body[1].author).toBe(true);
+      });
+  });
+
+  test("GET 200 - Responds with array of article objects based on order query", () => {
+    return request(app)
+      .get("/api/articles?order=asc")
+      .expect(200)
+      .then(({ body }) => {
+        expect(
+          Date.parse(body[0].created_at) < Date.parse(body[1].created_at),
+        ).toBe(true);
+      });
+  });
 });
 
 describe("/api/articles/:article_id", () => {
@@ -72,7 +102,7 @@ describe("/api/articles/:article_id", () => {
       });
   });
 
-  test("GET 404 - Responds with error message", () => {
+  test("GET 404 - Responds with error message if article doesn't exist", () => {
     return request(app)
       .get("/api/articles/50")
       .expect(404)
@@ -81,7 +111,7 @@ describe("/api/articles/:article_id", () => {
       });
   });
 
-  test("GET 200 - Responds with array of article objects", () => {
+  test("GET 200 - Responds with array of comment objects", () => {
     return request(app)
       .get("/api/articles/1/comments")
       .expect(200)
@@ -106,6 +136,14 @@ describe("/api/articles/:article_id", () => {
       .expect(404)
       .then(({ body }) => {
         expect(body).toEqual({ msg: "ID not found" });
+      });
+  });
+  test("GET 404 - Responds with error message", () => {
+    return request(app)
+      .get("/api/articles/4/comments")
+      .expect(404)
+      .then(({ body }) => {
+        expect(body).toEqual({ msg: "Article doesn't have comments" });
       });
   });
   describe("Invalid Methods", () => {

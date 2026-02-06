@@ -9,6 +9,7 @@ const topicsRouter = require("./routes/topics.routes");
 const articlesRouter = require("./routes/articles.routes");
 const usersRouter = require("./routes/users.routes");
 const commentsRouter = require("./routes/comments.routes");
+const InvalidQuery = require("./errors/InvalidQuery");
 
 //Valid Paths
 
@@ -30,6 +31,14 @@ app.all("/*path", (req, res, next) => {
 
 app.use((err, req, res, next) => {
   if (err instanceof NotFoundError) {
+    res.status(404).send({ msg: err.message });
+  } else {
+    next(err);
+  }
+});
+
+app.use((err, req, res, next) => {
+  if (err instanceof InvalidQuery) {
     res.status(404).send({ msg: err.message });
   } else {
     next(err);
