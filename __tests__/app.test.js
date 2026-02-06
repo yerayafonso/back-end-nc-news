@@ -205,13 +205,21 @@ describe("/api/users", () => {
   });
 });
 
-describe("/api/comments", () => {
+describe("/api/comments/:comment_id", () => {
   test("204: Deletes comment by ID", () => {
     return request(app)
       .delete("/api/comments/2")
       .expect(204)
+      .then(({ noContent }) => {
+        expect(noContent).toBe(true);
+      });
+  });
+  test("404: Responds with error message if ID is not available to delete", () => {
+    return request(app)
+      .delete("/api/comments/50")
+      .expect(404)
       .then(({ body }) => {
-        expect(body).not.toHaveProperty("comment_id");
+        expect(body.msg).toBe("ID not found");
       });
   });
 });

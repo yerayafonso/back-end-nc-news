@@ -5,10 +5,13 @@ const NotFoundError = require("../errors/NotFoundError");
 exports.deleteCommentById = (comment_id) => {
   return deleteCommentObjectById(comment_id)
     .then((comments) => {
-      return comments;
+      if (comments.length === 0) {
+        throw new NotFoundError("ID not found");
+      } else {
+        return "Comment has been deleted";
+      }
     })
     .catch((err) => {
-      console.error(err);
       throw new NotFoundError("ID not found");
     });
 };
