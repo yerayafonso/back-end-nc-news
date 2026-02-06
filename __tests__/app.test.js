@@ -38,7 +38,7 @@ describe("/api/articles", () => {
       .get("/api/articles")
       .expect(200)
       .then(({ body }) => {
-        body.forEach((article) => {
+        body.articles.forEach((article) => {
           expect(article.author).toBeString();
           expect(article.title).toBeString();
           expect(article.article_id).toBeNumber();
@@ -49,7 +49,8 @@ describe("/api/articles", () => {
           expect(article.comment_count).toBeNumber();
         });
         expect(
-          Date.parse(body[0].created_at) > Date.parse(body[1].created_at),
+          Date.parse(body.articles[0].created_at) >
+            Date.parse(body.articles[1].created_at),
         ).toBe(true);
       });
   });
@@ -59,7 +60,7 @@ describe("/api/articles", () => {
       .get("/api/articles?sort_by=author")
       .expect(200)
       .then(({ body }) => {
-        body.forEach((article) => {
+        body.articles.forEach((article) => {
           expect(article.author).toBeString();
           expect(article.title).toBeString();
           expect(article.article_id).toBeNumber();
@@ -69,7 +70,7 @@ describe("/api/articles", () => {
           expect(article.article_img_url).toBeString();
           expect(article.comment_count).toBeNumber();
         });
-        expect(body[0].author >= body[1].author).toBe(true);
+        expect(body.articles[0].author >= body.articles[1].author).toBe(true);
       });
   });
 
@@ -79,26 +80,65 @@ describe("/api/articles", () => {
       .expect(200)
       .then(({ body }) => {
         expect(
-          Date.parse(body[0].created_at) < Date.parse(body[1].created_at),
+          Date.parse(body.articles[0].created_at) <
+            Date.parse(body.articles[1].created_at),
         ).toBe(true);
+      });
+  });
+
+  test("GET 200 - Responds with an array of article objects based on topic query", () => {
+    return request(app)
+      .get("/api/articles?topic=mitch")
+      .expect(200)
+      .then(({ body }) => {
+        body.articles.forEach((article) => {
+          expect(article.topic).toBeString();
+        });
+      });
+  });
+  test("GET 404 - Responds with an error message for invalid topic query", () => {
+    return request(app)
+      .get("/api/articles?topic=me")
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Invalid Query");
+      });
+  });
+
+  test("GET 404 - Responds with an error message for invalid sort_by query", () => {
+    return request(app)
+      .get("/api/articles?sort_by=me")
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Invalid Query");
+      });
+  });
+
+  test("GET 404 - Responds with an error message for invalid order query", () => {
+    return request(app)
+      .get("/api/articles?order=me")
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Invalid Query");
       });
   });
 });
 
 describe("/api/articles/:article_id", () => {
-  test("GET 200 - Responds with single article object", () => {
+  test("GET 200 - Responds with single article object with a comment_count property", () => {
     return request(app)
       .get("/api/articles/1")
       .expect(200)
-      .then(({ body }) => {
-        expect(body.author).toBeString();
-        expect(body.title).toBeString();
-        expect(body.article_id).toBe(1);
-        expect(body.article_id).toBeNumber();
-        expect(body.topic).toBeString();
-        expect(body.created_at).toBeString();
-        expect(body.votes).toBeNumber();
-        expect(body.article_img_url).toBeString();
+      .then(({ body: { article } }) => {
+        expect(article.author).toBeString();
+        expect(article.title).toBeString();
+        expect(article.article_id).toBe(1);
+        expect(article.article_id).toBeNumber();
+        expect(article.topic).toBeString();
+        expect(article.created_at).toBeString();
+        expect(article.votes).toBeNumber();
+        expect(article.article_img_url).toBeString();
+        expect(article.comment_count).toBeNumber();
       });
   });
 
@@ -116,7 +156,7 @@ describe("/api/articles/:article_id", () => {
       .get("/api/articles/1/comments")
       .expect(200)
       .then(({ body }) => {
-        body.forEach((comment) => {
+        body.comments.forEach((comment) => {
           expect(comment.comment_id).toBeNumber();
           expect(comment.votes).toBeNumber();
           expect(comment.created_at).toBeString();
@@ -125,7 +165,8 @@ describe("/api/articles/:article_id", () => {
           expect(comment.article_id).toBeNumber();
         });
         expect(
-          Date.parse(body[0].created_at) > Date.parse(body[1].created_at),
+          Date.parse(body.comments[0].created_at) >
+            Date.parse(body.comments[1].created_at),
         ).toBe(true);
       });
   });
@@ -138,7 +179,7 @@ describe("/api/articles/:article_id", () => {
         expect(body).toEqual({ msg: "ID not found" });
       });
   });
-  test("GET 404 - Responds with error message", () => {
+  test("GET 404 - Responds with error message for an article that doesnt have comments", () => {
     return request(app)
       .get("/api/articles/4/comments")
       .expect(404)
@@ -146,6 +187,7 @@ describe("/api/articles/:article_id", () => {
         expect(body).toEqual({ msg: "Article doesn't have comments" });
       });
   });
+
   describe("Invalid Methods", () => {
     test("405: Responds with message", () => {
       const invalidMethods = ["delete", "post"];

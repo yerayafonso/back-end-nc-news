@@ -1,7 +1,7 @@
 const db = require("../db/connection");
 const InvalidQuery = require("../errors/InvalidQuery");
 
-exports.fetchAllArticles = (sort_by = "created_at", order = "DESC") => {
+exports.fetchAllArticles = (sort_by = "created_at", order = "DESC", topic) => {
   const validSortQuery = [
     "author",
     "title",
@@ -20,7 +20,53 @@ exports.fetchAllArticles = (sort_by = "created_at", order = "DESC") => {
   if (!validOrderQuery.includes(order.toUpperCase())) {
     throw new InvalidQuery("Invalid Query");
   }
+  if (topic) {
+    return db
+      .query(
+        `SELECT 
+      articles.author, 
+      articles.title, 
+      articles.article_id, 
+      articles.topic, 
+      articles.created_at, 
+      articles.votes, 
+      articles.article_img_url, 
+      CAST(COUNT(comments.article_id) AS INT) comment_count
+      FROM articles 
+      LEFT JOIN comments 
+      ON articles.article_id = comments.article_id 
+      WHERE articles.topic= $1
+      GROUP BY articles.article_id
+      ORDER BY articles.${sort_by} ${order.toUpperCase()};`,
+        [topic],
+      )
+      .then(({ rows }) => {
+        return rows;
+      })
+      .catch((err) => console.error(err));
+  } else {
+    return db
+      .query(
+        `SELECT 
+      articles.author, 
+      articles.title, 
+      articles.article_id, 
+      articles.topic, 
+      articles.created_at, 
+      articles.votes, 
+      articles.article_img_url, 
+      CAST(COUNT(comments.article_id) AS INT) comment_count
+      FROM articles 
+      LEFT JOIN comments 
+      ON articles.article_id = comments.article_id 
+      GROUP BY articles.article_id
+      ORDER BY articles.${sort_by} ${order.toUpperCase()};`,
+      )
+      .then(({ rows }) => rows);
+  }
+};
 
+exports.fetchArticleById = (article_id) => {
   return db
     .query(
       `SELECT 
@@ -35,25 +81,9 @@ exports.fetchAllArticles = (sort_by = "created_at", order = "DESC") => {
       FROM articles 
       LEFT JOIN comments 
       ON articles.article_id = comments.article_id 
+      WHERE articles.article_id = $1
       GROUP BY articles.article_id
-      ORDER BY articles.${sort_by} ${order.toUpperCase()};`,
-    )
-    .then(({ rows }) => rows);
-};
-
-exports.fetchArticleById = (article_id) => {
-  return db
-    .query(
-      `SELECT 
-      articles.author, 
-      articles.title, 
-      articles.article_id, 
-      articles.topic, 
-      articles.created_at, 
-      articles.votes, 
-      articles.article_img_url 
-      FROM articles 
-      WHERE article_id = $1;`,
+      ;`,
       [article_id],
     )
     .then(({ rows }) => rows[0]);
@@ -104,4 +134,10 @@ exports.checkArticleExists = (article_id) => {
   return db
     .query(`SELECT * FROM articles WHERE article_id = $1`, [article_id])
     .then(({ rows }) => rows.length === 1);
+};
+
+exports.checkArticleTopicsExists = (topic) => {
+  return db
+    .query(`SELECT * FROM articles WHERE topic = $1`, [topic])
+    .then(({ rows }) => rows.length > 0);
 };

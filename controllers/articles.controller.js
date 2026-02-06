@@ -6,11 +6,15 @@ const {
   patchArticleById: patchArticleByIdService,
 } = require("../service/articles.service");
 
-exports.getAllArticles = (req, res) => {
-  const { sort_by, order } = req.query;
-  getAllArticlesService(sort_by, order).then((articles) => {
-    res.status(200).send(articles);
-  });
+exports.getAllArticles = (req, res, next) => {
+  const { sort_by, order, topic } = req.query;
+  getAllArticlesService(sort_by, order, topic)
+    .then((articles) => {
+      res.status(200).send({ articles });
+    })
+    .catch((err) => {
+      next(err);
+    });
 };
 
 exports.getArticleById = (req, res, next) => {
