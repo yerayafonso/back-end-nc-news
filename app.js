@@ -8,6 +8,7 @@ app.use(express.json());
 const topicsRouter = require("./routes/topics.routes");
 const articlesRouter = require("./routes/articles.routes");
 const usersRouter = require("./routes/users.routes");
+const commentsRouter = require("./routes/comments.routes");
 
 //Valid Paths
 
@@ -16,6 +17,8 @@ app.use("/api/topics", topicsRouter);
 app.use("/api/articles", articlesRouter);
 
 app.use("/api/users", usersRouter);
+
+app.use("/api/comments", commentsRouter);
 
 // Invalid Path catch all
 

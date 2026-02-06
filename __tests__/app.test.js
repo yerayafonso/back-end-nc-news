@@ -204,3 +204,14 @@ describe("/api/users", () => {
       });
   });
 });
+
+describe("/api/comments", () => {
+  test("204: Deletes comment by ID", () => {
+    return request(app)
+      .delete("/api/comments/2")
+      .expect(204)
+      .then(({ body }) => {
+        expect(body).not.toHaveProperty("comment_id");
+      });
+  });
+});
