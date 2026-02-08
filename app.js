@@ -10,6 +10,7 @@ const articlesRouter = require("./routes/articles.routes");
 const usersRouter = require("./routes/users.routes");
 const commentsRouter = require("./routes/comments.routes");
 const InvalidQuery = require("./errors/InvalidQuery");
+const emojisRouter = require("./routes/emojis.routes");
 
 //Valid Paths
 
@@ -20,6 +21,8 @@ app.use("/api/articles", articlesRouter);
 app.use("/api/users", usersRouter);
 
 app.use("/api/comments", commentsRouter);
+
+app.use("/api/emojis", emojisRouter);
 
 // Invalid Path catch all
 

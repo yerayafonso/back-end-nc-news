@@ -303,3 +303,17 @@ describe("/api/comments/:comment_id", () => {
       });
   });
 });
+
+describe("/api/emojis", () => {
+  test("GET 200 - Responds with array of emojis objects", () => {
+    return request(app)
+      .get("/api/emojis")
+      .expect(200)
+      .then(({ body }) => {
+        body.forEach((emoji) => {
+          expect(emoji.emoji_name).toBeString();
+          expect(emoji).toHaveProperty("emoticon");
+        });
+      });
+  });
+});
