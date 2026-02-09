@@ -5,6 +5,7 @@ const {
   postArticleByIdComments: postArticleByIdCommentsService,
   patchArticleById: patchArticleByIdService,
 } = require("../service/articles.service");
+const InvalidType = require("../errors/InvalidType");
 
 exports.getAllArticles = (req, res, next) => {
   const { sort_by, order, topic } = req.query;
@@ -20,6 +21,9 @@ exports.getAllArticles = (req, res, next) => {
 exports.getArticleById = (req, res, next) => {
   const { article_id } = req.params;
 
+  if (isNaN(+article_id)) {
+    throw new InvalidType("Invalid ID type");
+  }
   getArticleByIdService(article_id)
     .then((article) => {
       res.status(200).send(article);

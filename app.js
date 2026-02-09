@@ -11,6 +11,7 @@ const usersRouter = require("./routes/users.routes");
 const commentsRouter = require("./routes/comments.routes");
 const InvalidQuery = require("./errors/InvalidQuery");
 const emojisRouter = require("./routes/emojis.routes");
+const InvalidType = require("./errors/InvalidType");
 
 //Valid Paths
 
@@ -42,6 +43,13 @@ app.use((err, req, res, next) => {
 
 app.use((err, req, res, next) => {
   if (err instanceof InvalidQuery) {
+    res.status(400).send({ msg: err.message });
+  } else {
+    next(err);
+  }
+});
+app.use((err, req, res, next) => {
+  if (err instanceof InvalidType) {
     res.status(400).send({ msg: err.message });
   } else {
     next(err);

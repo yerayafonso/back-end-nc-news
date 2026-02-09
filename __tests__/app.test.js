@@ -190,7 +190,14 @@ describe("/api/articles/:article_id", () => {
         expect(body).toEqual({ msg: "ID not found" });
       });
   });
-
+  test("GET 404 - Responds with error message for invalid data type", () => {
+    return request(app)
+      .get("/api/articles/banana")
+      .expect(400)
+      .then(({ body }) => {
+        expect(body).toEqual({ msg: "Invalid ID type" });
+      });
+  });
   test("GET 200 - Responds with array of comment objects", () => {
     return request(app)
       .get("/api/articles/1/comments")
