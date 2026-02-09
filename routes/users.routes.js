@@ -3,10 +3,11 @@ const {
   getAllUsers,
   getAllUsersByUsername,
 } = require("../controllers/users.controller");
+const handleInvalidMethods = require("../errors/handleInvalidMethods");
 
 const usersRouter = express.Router();
 
-usersRouter.get("/", getAllUsers);
+usersRouter.route("/").get(getAllUsers).all(handleInvalidMethods);
 usersRouter.get("/:username", getAllUsersByUsername);
 
 module.exports = usersRouter;

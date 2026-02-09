@@ -6,6 +6,7 @@ const {
   patchArticleById: patchArticleByIdService,
 } = require("../service/articles.service");
 const InvalidType = require("../errors/InvalidType");
+const InvalidQuery = require("../errors/InvalidQuery");
 
 exports.getAllArticles = (req, res, next) => {
   const { sort_by, order, topic } = req.query;
@@ -37,6 +38,9 @@ exports.getArticleById = (req, res, next) => {
 exports.getArticleByIdComments = (req, res, next) => {
   const { article_id } = req.params;
 
+  if (isNaN(+article_id)) {
+    throw new InvalidType("Invalid ID type");
+  }
   getArticleByIdCommentsService(article_id)
     .then((comments) => {
       res.status(200).send(comments);
@@ -49,6 +53,13 @@ exports.getArticleByIdComments = (req, res, next) => {
 exports.postArticleByIdComments = (req, res, next) => {
   const { article_id } = req.params;
   const { username, body } = req.body;
+  if (isNaN(+article_id)) {
+    throw new InvalidType("Invalid ID type");
+  }
+
+  if (!username || !body) {
+    throw new InvalidQuery("Missing property");
+  }
 
   postArticleByIdCommentsService(article_id, username, body)
     .then((comments) => {

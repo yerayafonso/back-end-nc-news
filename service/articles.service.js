@@ -63,7 +63,7 @@ exports.postArticleByIdComments = (article_id, username, body) => {
       }
     })
     .catch((err) => {
-      throw new NotFoundError("ID not found");
+      throw new NotFoundError("Article ID/User not found");
     });
 };
 

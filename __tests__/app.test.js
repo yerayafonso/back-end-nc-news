@@ -18,6 +18,94 @@ describe("Invalid endpoint", () => {
   });
 });
 
+describe("Invalid Methods", () => {
+  test("405: Responds with error message for invalid method on /api/articles", () => {
+    const invalidMethods = ["delete", "post", "patch"];
+
+    const requests = invalidMethods.map((method) => {
+      return request(app)
+        [method]("/api/articles")
+        .expect(405)
+        .then(({ body }) => {
+          expect(body.msg).toBe("Method not allowed");
+        });
+    });
+
+    return Promise.all(requests);
+  });
+
+  test("405: Responds with message or invalid method on /api/articles/:article_id", () => {
+    const invalidMethods = ["delete", "post"];
+
+    const requests = invalidMethods.map((method) => {
+      return request(app)
+        [method]("/api/articles/2")
+        .expect(405)
+        .then(({ body }) => {
+          expect(body.msg).toBe("Method not allowed");
+        });
+    });
+
+    return Promise.all(requests);
+  });
+  test("405: Responds with message or invalid method on /api/users", () => {
+    const invalidMethods = ["delete", "post", "patch"];
+
+    const requests = invalidMethods.map((method) => {
+      return request(app)
+        [method]("/api/users")
+        .expect(405)
+        .then(({ body }) => {
+          expect(body.msg).toBe("Method not allowed");
+        });
+    });
+
+    return Promise.all(requests);
+  });
+  test("405: Responds with message or invalid method on /api/topics", () => {
+    const invalidMethods = ["delete", "post", "patch"];
+
+    const requests = invalidMethods.map((method) => {
+      return request(app)
+        [method]("/api/topics")
+        .expect(405)
+        .then(({ body }) => {
+          expect(body.msg).toBe("Method not allowed");
+        });
+    });
+
+    return Promise.all(requests);
+  });
+  test("405: Responds with message or invalid method on /api/emojis", () => {
+    const invalidMethods = ["delete", "post", "patch"];
+
+    const requests = invalidMethods.map((method) => {
+      return request(app)
+        [method]("/api/emojis")
+        .expect(405)
+        .then(({ body }) => {
+          expect(body.msg).toBe("Method not allowed");
+        });
+    });
+
+    return Promise.all(requests);
+  });
+  test("405: Responds with message or invalid method on /api/comments", () => {
+    const invalidMethods = ["delete", "post", "patch"];
+
+    const requests = invalidMethods.map((method) => {
+      return request(app)
+        [method]("/api/comments")
+        .expect(405)
+        .then(({ body }) => {
+          expect(body.msg).toBe("Method not allowed");
+        });
+    });
+
+    return Promise.all(requests);
+  });
+});
+
 describe("/api/topics", () => {
   test("GET 200 - Responds with array of objects", () => {
     return request(app)
@@ -218,7 +306,7 @@ describe("/api/articles/:article_id", () => {
       });
   });
 
-  test("GET 404 - Responds with error message", () => {
+  test("GET 404 - Responds with error message for invalid ID number", () => {
     return request(app)
       .get("/api/articles/50/comments")
       .expect(404)
@@ -226,63 +314,22 @@ describe("/api/articles/:article_id", () => {
         expect(body).toEqual({ msg: "ID not found" });
       });
   });
-  test("GET 404 - Responds with error message for an article that doesnt have comments", () => {
+
+  test("400 - Responds with error message for invalid ID type", () => {
+    return request(app)
+      .get("/api/articles/banana/comments")
+      .expect(400)
+      .then(({ body }) => {
+        expect(body).toEqual({ msg: "Invalid ID type" });
+      });
+  });
+  test("404 - Responds with error message for an article that doesnt have comments", () => {
     return request(app)
       .get("/api/articles/4/comments")
       .expect(404)
       .then(({ body }) => {
         expect(body).toEqual({ msg: "Article doesn't have comments" });
       });
-  });
-
-  describe("Invalid Methods", () => {
-    test("405: Responds with message", () => {
-      const invalidMethods = ["delete", "post"];
-
-      const requests = invalidMethods.map((method) => {
-        return request(app)
-          [method]("/api/articles/2")
-          .expect(405)
-          .then(({ body }) => {
-            expect(body.msg).toBe("Method not allowed");
-          });
-      });
-
-      return Promise.all(requests);
-    });
-  });
-
-  describe("POST /api/articles/:article_id/comments", () => {
-    test("201: Responds with the new comment object", () => {
-      return request(app)
-        .post("/api/articles/3/comments")
-        .send({
-          username: "butter_bridge",
-          body: "Random text",
-        })
-        .expect(201)
-        .then(({ body }) => {
-          expect(body.comment_id).toBeNumber();
-          expect(body.votes).toBeNumber();
-          expect(body.created_at).toBeString();
-          expect(body.author).toBeString();
-          expect(body.body).toBeString();
-          expect(body.article_id).toBeNumber();
-        });
-    });
-
-    test("404: Responds with error message", () => {
-      return request(app)
-        .post("/api/articles/25/comments")
-        .send({
-          username: "butter_bridge",
-          body: "Random text",
-        })
-        .expect(404)
-        .then(({ body }) => {
-          expect(body.msg).toBe("ID not found");
-        });
-    });
   });
 
   describe("PATCH /api/articles/:article_id", () => {
@@ -314,6 +361,105 @@ describe("/api/articles/:article_id", () => {
           expect(body.msg).toBe("ID not found");
         });
     });
+  });
+});
+
+describe("POST /api/articles/:article_id/comments", () => {
+  test("201: Responds with the new comment object", () => {
+    return request(app)
+      .post("/api/articles/3/comments")
+      .send({
+        username: "butter_bridge",
+        body: "Random text",
+      })
+      .expect(201)
+      .then(({ body }) => {
+        expect(body.comment_id).toBeNumber();
+        expect(body.votes).toBeNumber();
+        expect(body.created_at).toBeString();
+        expect(body.author).toBe("butter_bridge");
+        expect(body.body).toBe("Random text");
+        expect(body.article_id).toBe(3);
+      });
+  });
+
+  test("201: Responds with the new comment object and ignores additional properties", () => {
+    return request(app)
+      .post("/api/articles/3/comments")
+      .send({
+        username: "butter_bridge",
+        body: "Random text",
+        votes: 99,
+      })
+      .expect(201)
+      .then(({ body }) => {
+        expect(body.comment_id).toBeNumber();
+        expect(body.votes).toBeNumber();
+        expect(body.votes).toBe(0);
+        expect(body.created_at).toBeString();
+        expect(body.author).toBeString();
+        expect(body.body).toBeString();
+        expect(body.article_id).toBeNumber();
+      });
+  });
+
+  test("404: Responds with error message", () => {
+    return request(app)
+      .post("/api/articles/25/comments")
+      .send({
+        username: "butter_bridge",
+        body: "Random text",
+      })
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Article ID/User not found");
+      });
+  });
+  test("400 - Responds with error message for invalid ID type", () => {
+    return request(app)
+      .post("/api/articles/banana/comments")
+      .send({
+        username: "butter_bridge",
+        body: "Random text",
+      })
+      .expect(400)
+      .then(({ body }) => {
+        expect(body).toEqual({ msg: "Invalid ID type" });
+      });
+  });
+  test("400 - Responds with error message for missing username property", () => {
+    return request(app)
+      .post("/api/articles/2/comments")
+      .send({
+        body: "Random text",
+      })
+      .expect(400)
+      .then(({ body }) => {
+        expect(body).toEqual({ msg: "Missing property" });
+      });
+  });
+  test("400 - Responds with error message for missing body property", () => {
+    return request(app)
+      .post("/api/articles/2/comments")
+      .send({
+        username: "butter_bridge",
+      })
+      .expect(400)
+      .then(({ body }) => {
+        expect(body).toEqual({ msg: "Missing property" });
+      });
+  });
+  test("404 - Responds with error message for missing body property", () => {
+    return request(app)
+      .post("/api/articles/2/comments")
+      .send({
+        username: "trollUser",
+        body: "Random troll text",
+      })
+      .expect(404)
+      .then(({ body }) => {
+        expect(body).toEqual({ msg: "Article ID/User not found" });
+      });
   });
 });
 

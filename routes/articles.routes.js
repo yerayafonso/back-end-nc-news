@@ -10,7 +10,7 @@ const handleInvalidMethods = require("../errors/handleInvalidMethods");
 
 const articlesRouter = express.Router();
 
-articlesRouter.get("/", getAllArticles);
+articlesRouter.route("/").get(getAllArticles).all(handleInvalidMethods);
 
 articlesRouter
   .route("/:article_id")
