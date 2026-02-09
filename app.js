@@ -42,7 +42,7 @@ app.use((err, req, res, next) => {
 
 app.use((err, req, res, next) => {
   if (err instanceof InvalidQuery) {
-    res.status(404).send({ msg: err.message });
+    res.status(400).send({ msg: err.message });
   } else {
     next(err);
   }

@@ -19,7 +19,19 @@ describe("Invalid endpoint", () => {
 });
 
 describe("/api/topics", () => {
-  test("GET 200 - Responds with array of topic objects", () => {
+  test("GET 200 - Responds with array of objects", () => {
+    return request(app)
+      .get("/api/topics")
+      .expect(200)
+      .then(({ body }) => {
+        expect(body).toBeArray();
+        body.forEach((topic) => {
+          expect(topic).toBeObject();
+        });
+      });
+  });
+
+  test("GET 200 - Responds with array of topic objects with slug and description properties", () => {
     return request(app)
       .get("/api/topics")
       .expect(200)
@@ -33,7 +45,19 @@ describe("/api/topics", () => {
 });
 
 describe("/api/articles", () => {
-  test("GET 200 - Responds with array of article objects", () => {
+  test("GET 200 - Responds with array of objects", () => {
+    return request(app)
+      .get("/api/articles")
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.articles).toBeArray();
+        body.articles.forEach((article) => {
+          expect(article).toBeObject();
+        });
+      });
+  });
+
+  test("GET 200 - Each article object has properties: author, title, article_id, topic, created_at, votes, artile_img_url", () => {
     return request(app)
       .get("/api/articles")
       .expect(200)
@@ -48,41 +72,57 @@ describe("/api/articles", () => {
           expect(article.article_img_url).toBeString();
           expect(article.comment_count).toBeNumber();
         });
-        expect(
-          Date.parse(body.articles[0].created_at) >
-            Date.parse(body.articles[1].created_at),
-        ).toBe(true);
+      });
+  });
+  test("GET 200 - Each article object has comment_count property that is a number", () => {
+    return request(app)
+      .get("/api/articles")
+      .expect(200)
+      .then(({ body }) => {
+        body.articles.forEach((article) => {
+          expect(article.comment_count).toBeNumber();
+        });
       });
   });
 
-  test("GET 200 - Responds with array of article objects based on sort_by query", () => {
+  test("GET 200 - Each article object is sorted by created_at property and in descending order by default", () => {
+    return request(app)
+      .get("/api/articles")
+      .expect(200)
+      .then(({ body }) => {
+        for (let i = 1; i < body.articles.length; i++) {
+          expect(
+            Date.parse(body.articles[i - 1].created_at) >=
+              Date.parse(body.articles[i].created_at),
+          ).toBe(true);
+        }
+      });
+  });
+
+  test("GET 200 - Responds with array of article objects based on sort_by query and defaults to descending order", () => {
     return request(app)
       .get("/api/articles?sort_by=author")
       .expect(200)
       .then(({ body }) => {
-        body.articles.forEach((article) => {
-          expect(article.author).toBeString();
-          expect(article.title).toBeString();
-          expect(article.article_id).toBeNumber();
-          expect(article.topic).toBeString();
-          expect(article.created_at).toBeString();
-          expect(article.votes).toBeNumber();
-          expect(article.article_img_url).toBeString();
-          expect(article.comment_count).toBeNumber();
-        });
-        expect(body.articles[0].author >= body.articles[1].author).toBe(true);
+        for (let i = 1; i < body.articles.length - 1; i++) {
+          expect(body.articles[i - 1].author >= body.articles[i].author).toBe(
+            true,
+          );
+        }
       });
   });
 
-  test("GET 200 - Responds with array of article objects based on order query", () => {
+  test("GET 200 - Responds with array of article objects based on order query and sorted by created_at column by default", () => {
     return request(app)
       .get("/api/articles?order=asc")
       .expect(200)
       .then(({ body }) => {
-        expect(
-          Date.parse(body.articles[0].created_at) <
-            Date.parse(body.articles[1].created_at),
-        ).toBe(true);
+        for (let i = 1; i < body.articles.length - 1; i++) {
+          expect(
+            Date.parse(body.articles[i - 1].created_at) <=
+              Date.parse(body.articles[i].created_at),
+          ).toBe(true);
+        }
       });
   });
 
@@ -96,28 +136,28 @@ describe("/api/articles", () => {
         });
       });
   });
-  test("GET 404 - Responds with an error message for invalid topic query", () => {
+  test("GET 400 - Responds with an error message for invalid topic query", () => {
     return request(app)
       .get("/api/articles?topic=me")
-      .expect(404)
+      .expect(400)
       .then(({ body }) => {
         expect(body.msg).toBe("Invalid Query");
       });
   });
 
-  test("GET 404 - Responds with an error message for invalid sort_by query", () => {
+  test("GET 400 - Responds with an error message for invalid sort_by query", () => {
     return request(app)
       .get("/api/articles?sort_by=me")
-      .expect(404)
+      .expect(400)
       .then(({ body }) => {
         expect(body.msg).toBe("Invalid Query");
       });
   });
 
-  test("GET 404 - Responds with an error message for invalid order query", () => {
+  test("GET 400 - Responds with an error message for invalid order query", () => {
     return request(app)
       .get("/api/articles?order=me")
-      .expect(404)
+      .expect(400)
       .then(({ body }) => {
         expect(body.msg).toBe("Invalid Query");
       });
@@ -281,6 +321,28 @@ describe("/api/users", () => {
           expect(users.name).toBeString();
           expect(users.avatar_url).toBeString();
         });
+      });
+  });
+});
+
+describe("/api/users/:username", () => {
+  test("GET 200 - Responds with a user object", () => {
+    return request(app)
+      .get("/api/users/butter_bridge")
+      .expect(200)
+      .then(({ body }) => {
+        const user = body.user[0];
+        expect(user.username).toBeString();
+        expect(user.name).toBeString();
+        expect(user.avatar_url).toBeString();
+      });
+  });
+  test("GET 404 - Responds with an error message for an invalid username", () => {
+    return request(app)
+      .get("/api/users/butter_troll")
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.msg).toBe("User not found!");
       });
   });
 });
