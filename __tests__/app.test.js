@@ -3,6 +3,7 @@ const seed = require("../db/seeds/seed");
 const data = require("../db/data/test-data/index");
 const request = require("supertest");
 const app = require("../app");
+require("jest-sorted");
 
 beforeAll(() => seed(data));
 afterAll(() => db.end());
@@ -178,12 +179,7 @@ describe("/api/articles", () => {
       .get("/api/articles")
       .expect(200)
       .then(({ body }) => {
-        for (let i = 1; i < body.articles.length; i++) {
-          expect(
-            Date.parse(body.articles[i - 1].created_at) >=
-              Date.parse(body.articles[i].created_at),
-          ).toBe(true);
-        }
+        expect(body.articles).toBeSortedBy("created_at", { descending: true });
       });
   });
 
@@ -192,11 +188,7 @@ describe("/api/articles", () => {
       .get("/api/articles?sort_by=author")
       .expect(200)
       .then(({ body }) => {
-        for (let i = 1; i < body.articles.length - 1; i++) {
-          expect(body.articles[i - 1].author >= body.articles[i].author).toBe(
-            true,
-          );
-        }
+        expect(body.articles).toBeSortedBy("author", { descending: true });
       });
   });
 
@@ -205,12 +197,7 @@ describe("/api/articles", () => {
       .get("/api/articles?order=asc")
       .expect(200)
       .then(({ body }) => {
-        for (let i = 1; i < body.articles.length - 1; i++) {
-          expect(
-            Date.parse(body.articles[i - 1].created_at) <=
-              Date.parse(body.articles[i].created_at),
-          ).toBe(true);
-        }
+        expect(body.articles).toBeSortedBy("created_at");
       });
   });
 
@@ -331,37 +318,6 @@ describe("/api/articles/:article_id", () => {
         expect(body).toEqual({ msg: "Article doesn't have comments" });
       });
   });
-
-  describe("PATCH /api/articles/:article_id", () => {
-    test("200: Responds with the updated article object", async () => {
-      const currentVotes = await db.query(
-        `SELECT votes FROM articles WHERE article_id=3`,
-      );
-
-      return request(app)
-        .patch("/api/articles/3")
-        .send({
-          inc_votes: 35,
-        })
-        .expect(200)
-        .then(({ body }) => {
-          expect(body.votes).toBeNumber();
-          expect(body.votes).toBe(currentVotes.rows[0].votes + 35);
-        });
-    });
-
-    test("404: Responds with error message", () => {
-      return request(app)
-        .patch("/api/articles/20")
-        .send({
-          inc_votes: 35,
-        })
-        .expect(404)
-        .then(({ body }) => {
-          expect(body.msg).toBe("ID not found");
-        });
-    });
-  });
 });
 
 describe("POST /api/articles/:article_id/comments", () => {
@@ -459,6 +415,58 @@ describe("POST /api/articles/:article_id/comments", () => {
       .expect(404)
       .then(({ body }) => {
         expect(body).toEqual({ msg: "Article ID/User not found" });
+      });
+  });
+});
+
+describe("PATCH /api/articles/:article_id", () => {
+  test("200: Responds with the updated article object for increase in votes", async () => {
+    const currentVotes = await db.query(
+      `SELECT votes FROM articles WHERE article_id=3`,
+    );
+
+    const voteObject = { inc_votes: 35 };
+
+    return request(app)
+      .patch("/api/articles/3")
+      .send(voteObject)
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.votes).toBeNumber();
+        expect(body.votes).toBe(
+          currentVotes.rows[0].votes + voteObject.inc_votes,
+        );
+      });
+  });
+
+  test("200: Responds with the updated article object for decrease in votes", async () => {
+    const currentVotes = await db.query(
+      `SELECT votes FROM articles WHERE article_id=3`,
+    );
+
+    const voteObject = { inc_votes: -35 };
+
+    return request(app)
+      .patch("/api/articles/3")
+      .send(voteObject)
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.votes).toBeNumber();
+        expect(body.votes).toBe(
+          currentVotes.rows[0].votes + voteObject.inc_votes,
+        );
+      });
+  });
+
+  test("404: Responds with error message", () => {
+    return request(app)
+      .patch("/api/articles/20")
+      .send({
+        inc_votes: 35,
+      })
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.msg).toBe("ID not found");
       });
   });
 });
