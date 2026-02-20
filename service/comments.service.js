@@ -1,4 +1,7 @@
-const { deleteCommentObjectById } = require("../models/comments.model");
+const {
+  deleteCommentObjectById,
+  patchCommentObjectById,
+} = require("../models/comments.model");
 
 const NotFoundError = require("../errors/NotFoundError");
 
@@ -9,6 +12,20 @@ exports.deleteCommentById = (comment_id) => {
         throw new NotFoundError("ID not found");
       } else {
         return "Comment has been deleted";
+      }
+    })
+    .catch((err) => {
+      throw new NotFoundError("ID not found");
+    });
+};
+
+exports.patchCommentById = (comment_id, inc_votes) => {
+  return patchCommentObjectById(comment_id, inc_votes)
+    .then((comment) => {
+      if (!comment) {
+        throw new NotFoundError("ID not found");
+      } else {
+        return comment;
       }
     })
     .catch((err) => {

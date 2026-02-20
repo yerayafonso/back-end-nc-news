@@ -1,5 +1,6 @@
 const {
   deleteCommentById: deleteCommentByIdService,
+  patchCommentById: patchCommentByIdService,
 } = require("../service/comments.service");
 const InvalidType = require("../errors/InvalidType");
 
@@ -11,6 +12,19 @@ exports.deleteCommentById = (req, res, next) => {
   deleteCommentByIdService(comment_id)
     .then(() => {
       res.sendStatus(204);
+    })
+    .catch((err) => {
+      next(err);
+    });
+};
+
+exports.patchCommentById = (req, res, next) => {
+  const { comment_id } = req.params;
+  const { inc_votes } = req.body;
+
+  patchCommentByIdService(comment_id, inc_votes)
+    .then((comment) => {
+      res.status(200).send(comment);
     })
     .catch((err) => {
       next(err);

@@ -1,0 +1,504 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="./styles.css" />
+    <title>NC News API</title>
+  </head>
+  <body>
+    <header>
+      <div>
+        <h1>NC News API</h1>
+        <p>
+          This API will retrieve information regarding various users, topics and
+          articles from the backend database based on the various endpoints
+        </p>
+      </div>
+    </header>
+    <nav>
+      <ul class="nav-list">
+        <li><a class="nav-link" href="#topics">topics</a></li>
+        <li><a class="nav-link" href="#articles">articles</a></li>
+        <li><a class="nav-link" href="#users">users</a></li>
+        <li>
+          <a class="nav-link" href="#articles/:article_id"
+            >articles/:article_id</a
+          >
+        </li>
+        <li>
+          <a class="nav-link" href="#articles/:article_id/comments"
+            >articles/:article_id/comments</a
+          >
+        </li>
+        <li>
+          <a class="nav-link" href="#POST articles/:article_id/comments"
+            >POST articles/:article_id/comments</a
+          >
+        </li>
+        <li>
+          <a class="nav-link" href="#PATCH articles/:article_id"
+            >PATCH articles/:article_id</a
+          >
+        </li>
+        <li>
+          <a class="nav-link" href="#DELETE articles/comments/:comment_id"
+            >DELETE articles/:article_id/comments</a
+          >
+        </li>
+      </ul>
+    </nav>
+    <main>
+      <h2>Available Endpoints</h2>
+      <ul>
+        <li class="endpoint-card">
+          <h3 id="topics">GET /api/topics</h3>
+          <p>Retrieve a list of all topics.</p>
+
+          <h4>Example response:</h4>
+          <pre>
+  <code>
+{
+  "topics": [
+    {
+      "slug": "coding",
+      "description": "Code is love, code is life"
+    },
+    {
+      "slug": "football",
+      "description": "FOOTIE!"
+    },
+    {
+      "slug": "cooking",
+      "description": "Hey good looking, what you got cooking?"
+    }
+  ]
+}
+  </code>
+</pre>
+        </li>
+
+        <li class="endpoint-card">
+          <h3 id="articles">GET /api/articles</h3>
+          <p>Retrieve a list of all articles.</p>
+
+          <h4>Example response snippet:</h4>
+          <p>
+            Actual list is longer, but a shortened list is provided for example
+            output
+          </p>
+          <pre>
+  <code>
+{
+  "articles": [
+    {
+      "author": "grumpy19",
+      "title": "The Notorious MSG’s Unlikely Formula For Success",
+      "article_id": 34,
+      "topic": "cooking",
+      "created_at": "2020-11-22T11:13:00.000Z",
+      "votes": 0,
+      "article_img_url": "https://images.pexels.com/photos/2403392/pexels-photo-2403392.jpeg?w=700&h=700",
+      "comment_count": 11
+    },
+    {
+      "author": "tickle122",
+      "title": "The battle for Node.js security has only begun",
+      "article_id": 12,
+      "topic": "coding",
+      "created_at": "2020-11-15T13:25:00.000Z",
+      "votes": 0,
+      "article_img_url": "https://images.pexels.com/photos/10845119/pexels-photo-10845119.jpeg?w=700&h=700",
+      "comment_count": 7
+    },
+    {
+      "author": "grumpy19",
+      "title": "JavaScript’s Apply, Call, and Bind Methods are Essential for JavaScript Professionals",
+      "article_id": 6,
+      "topic": "coding",
+      "created_at": "2020-11-11T15:09:00.000Z",
+      "votes": 0,
+      "article_img_url": "https://images.pexels.com/photos/4383298/pexels-photo-4383298.jpeg?w=700&h=700",
+      "comment_count": 11
+    }
+    ]
+}
+  </code>
+</pre>
+
+          <h4>Sorting Queries</h4>
+          <p>Retrieve a list of all articles based on the named queries.</p>
+          <p>
+            Calling the articles API endpoint without any queries will return
+            the full list of articles. By default the articles will be sorted by
+            their <code>created_at</code> column in descending order. This can
+            be changed by adding a 'sort_by' and 'order' query to the GET
+            request.
+          </p>
+          <p>
+            Example: <code>?sort_by=author</code> will order the articles by
+            their author in reverse alphabetical order (descending order based
+            on UTF-8 character code).
+            <code>?sort_by=author&order=asc</code> will order the articles by
+            author in alphabetical order.
+          </p>
+
+          <h4>Example response snippet:</h4>
+          <p>Endpoint: <code>/api/articles?sort_by=author&order=asc</code></p>
+          <p>
+            Actual list is longer, but a shortened list is provided for example
+            output
+          </p>
+
+          <pre>
+  <code>
+{
+  "articles": [
+    {
+      "author": "cooljmessy",
+      "title": "Which current Premier League manager was the best player?",
+      "article_id": 17,
+      "topic": "football",
+      "created_at": "2020-03-19T11:15:00.000Z",
+      "votes": 0,
+      "article_img_url": "https://images.pexels.com/photos/47343/the-ball-stadion-horn-corner-47343.jpeg?w=700&h=700",
+      "comment_count": 12
+    },
+    {
+      "author": "cooljmessy",
+      "title": "Stone Soup",
+      "article_id": 35,
+      "topic": "cooking",
+      "created_at": "2020-05-26T07:25:00.000Z",
+      "votes": 0,
+      "article_img_url": "https://images.pexels.com/photos/33242/cooking-ingredient-cuisine-kitchen.jpg?w=700&h=700",
+      "comment_count": 14
+    },
+    {
+      "author": "cooljmessy",
+      "title": "Express.js: A Server-Side JavaScript Framework",
+      "article_id": 8,
+      "topic": "coding",
+      "created_at": "2020-10-05T23:23:00.000Z",
+      "votes": 0,
+      "article_img_url": "https://images.pexels.com/photos/11035482/pexels-photo-11035482.jpeg?w=700&h=700",
+      "comment_count": 7
+    },
+    {
+      "author": "cooljmessy",
+      "title": "An Introduction to JavaScript Object Notation (JSON) in JavaScript and .NET",
+      "article_id": 10,
+      "topic": "coding",
+      "created_at": "2020-07-02T12:23:00.000Z",
+      "votes": 0,
+      "article_img_url": "https://images.pexels.com/photos/11035481/pexels-photo-11035481.jpeg?w=700&h=700",
+      "comment_count": 8
+    },
+    {
+      "author": "grumpy19",
+      "title": "The People Tracking Every Touch, Pass And Tackle in the World Cup",
+      "article_id": 18,
+      "topic": "football",
+      "created_at": "2020-08-17T15:03:00.000Z",
+      "votes": 0,
+      "article_img_url": "https://images.pexels.com/photos/1884576/pexels-photo-1884576.jpeg?w=700&h=700",
+      "comment_count": 8
+    }
+    ]
+}
+  </code>
+</pre>
+          <h4>Filtering Queries</h4>
+          <p>
+            Retrieve a filtered list of articles based on the topic queries.
+          </p>
+          <p>
+            Using the topics query will filter the list of articles based on the
+            topic passed into the endpoint. <code>?topic=cooking</code> will
+            return a list of all articles that have a topic of cooking. Can be
+            combined with the sort_by and order queries to create a filtered and
+            sorted list.
+          </p>
+
+          <h4>Example response snippet:</h4>
+          <p>
+            Endpoint:
+            <code>/api/articles?sort_by=author&order=asc&topic=coding</code>
+          </p>
+          <p>
+            Actual list is longer, but a shortened list is provided for example
+            output
+          </p>
+
+          <pre>
+  <code>
+{
+  "articles": [
+    {
+      "author": "cooljmessy",
+      "title": "Express.js: A Server-Side JavaScript Framework",
+      "article_id": 8,
+      "topic": "coding",
+      "created_at": "2020-10-05T23:23:00.000Z",
+      "votes": 0,
+      "article_img_url": "https://images.pexels.com/photos/11035482/pexels-photo-11035482.jpeg?w=700&h=700",
+      "comment_count": 7
+    },
+    {
+      "author": "cooljmessy",
+      "title": "An Introduction to JavaScript Object Notation (JSON) in JavaScript and .NET",
+      "article_id": 10,
+      "topic": "coding",
+      "created_at": "2020-07-02T12:23:00.000Z",
+      "votes": 0,
+      "article_img_url": "https://images.pexels.com/photos/11035481/pexels-photo-11035481.jpeg?w=700&h=700",
+      "comment_count": 8
+    },
+    {
+      "author": "grumpy19",
+      "title": "Learn HTML5, CSS3, and Responsive WebSite Design in One Go",
+      "article_id": 9,
+      "topic": "coding",
+      "created_at": "2020-05-26T15:06:00.000Z",
+      "votes": 0,
+      "article_img_url": "https://images.pexels.com/photos/1591061/pexels-photo-1591061.jpeg?w=700&h=700",
+      "comment_count": 8
+    },
+    {
+      "author": "grumpy19",
+      "title": "JavaScript’s Apply, Call, and Bind Methods are Essential for JavaScript Professionals",
+      "article_id": 6,
+      "topic": "coding",
+      "created_at": "2020-11-11T15:09:00.000Z",
+      "votes": 0,
+      "article_img_url": "https://images.pexels.com/photos/4383298/pexels-photo-4383298.jpeg?w=700&h=700",
+      "comment_count": 11
+    },
+    {
+      "author": "happyamy2016",
+      "title": "22 Amazing open source React projects",
+      "article_id": 3,
+      "topic": "coding",
+      "created_at": "2020-02-29T11:12:00.000Z",
+      "votes": 0,
+      "article_img_url": "https://images.pexels.com/photos/11035471/pexels-photo-11035471.jpeg?w=700&h=700",
+      "comment_count": 10
+    }
+    ]
+}
+  </code>
+</pre>
+        </li>
+        <li class="endpoint-card">
+          <h3 id="users">GET /api/users</h3>
+          <p>Retrieve a list of all users.</p>
+
+          <h4>Example response:</h4>
+          <pre>
+  <code>
+[
+  {
+    "username": "tickle122",
+    "name": "Tom Tickle",
+    "avatar_url": "https://vignette.wikia.nocookie.net/mrmen/images/d/d6/Mr-Tickle-9a.png/revision/latest?cb=20180127221953"
+  },
+  {
+    "username": "grumpy19",
+    "name": "Paul Grump",
+    "avatar_url": "https://vignette.wikia.nocookie.net/mrmen/images/7/78/Mr-Grumpy-3A.PNG/revision/latest?cb=20170707233013"
+  },
+  {
+    "username": "happyamy2016",
+    "name": "Amy Happy",
+    "avatar_url": "https://vignette1.wikia.nocookie.net/mrmen/images/7/7f/Mr_Happy.jpg/revision/latest?cb=20140102171729"
+  },
+  {
+    "username": "cooljmessy",
+    "name": "Peter Messy",
+    "avatar_url": "https://vignette.wikia.nocookie.net/mrmen/images/1/1a/MR_MESSY_4A.jpg/revision/latest/scale-to-width-down/250?cb=20170730171002"
+  },
+  {
+    "username": "weegembump",
+    "name": "Gemma Bump",
+    "avatar_url": "https://vignette.wikia.nocookie.net/mrmen/images/7/7e/MrMen-Bump.png/revision/latest?cb=20180123225553"
+  },
+  {
+    "username": "jessjelly",
+    "name": "Jess Jelly",
+    "avatar_url": "https://vignette.wikia.nocookie.net/mrmen/images/4/4f/MR_JELLY_4A.jpg/revision/latest?cb=20180104121141"
+  }
+]
+  </code>
+</pre>
+        </li>
+        <li class="endpoint-card">
+          <h3 id="articles/:article_id">GET /api/articles/:article_id</h3>
+          <p>Retrieve a list of all articles based on the ID number.</p>
+
+          <h4>Example response for ID=2:</h4>
+          <pre>
+  <code>
+{
+  "article": {
+    "author": "jessjelly",
+    "title": "The Rise Of Thinking Machines: How IBM's Watson Takes On The World",
+    "article_id": 2,
+    "topic": "coding",
+    "created_at": "2020-05-14T01:02:00.000Z",
+    "votes": 0,
+    "article_img_url": "https://images.pexels.com/photos/373543/pexels-photo-373543.jpeg?w=700&h=700",
+    "comment_count": 6
+  }
+}
+  </code>
+</pre>
+        </li>
+
+        <li class="endpoint-card">
+          <h3 id="articles/:article_id/comments">
+            GET /api/articles/:article_id/comments
+          </h3>
+          <p>
+            Retrieve a list of all comments under an article based on the
+            article ID.
+          </p>
+
+          <h4>Example response for ID=2:</h4>
+          <pre>
+  <code>
+{
+  "comments": [
+    {
+      "comment_id": 162,
+      "votes": 14,
+      "created_at": "2020-10-03T19:22:00.000Z",
+      "author": "grumpy19",
+      "body": "Et suscipit maxime sit sunt consequuntur consequatur fugiat molestias. Et quis enim vero.",
+      "article_id": 2
+    },
+    {
+      "comment_id": 102,
+      "votes": 10,
+      "created_at": "2020-09-14T12:13:00.000Z",
+      "author": "jessjelly",
+      "body": "Quia quos adipisci sint expedita voluptatem id ut at accusantium. Et ex itaque recusandae aut quo. Quia quam similique eum quidem iusto. Aspernatur ducimus vitae vel natus doloribus qui id. Excepturi voluptatem qui quia sit qui eveniet voluptatem. Fugit itaque libero quibusdam sunt.",
+      "article_id": 2
+    },
+    {
+      "comment_id": 152,
+      "votes": 18,
+      "created_at": "2020-09-10T03:16:00.000Z",
+      "author": "grumpy19",
+      "body": "Animi id fuga culpa voluptates sint qui. Nostrum deleniti optio quo quas eveniet excepturi voluptates voluptatem totam. Provident dolores nesciunt dignissimos quisquam laboriosam iusto aut recusandae est.",
+      "article_id": 2
+    },
+    {
+      "comment_id": 63,
+      "votes": -1,
+      "created_at": "2020-08-12T23:10:00.000Z",
+      "author": "jessjelly",
+      "body": "Est pariatur quis ipsa culpa unde temporibus et accusantium rerum. Consequatur in occaecati aut non similique aut quibusdam. Qui sunt magnam iure blanditiis. Et est non enim. Est ab vero dolor.",
+      "article_id": 2
+    },
+    {
+      "comment_id": 191,
+      "votes": 12,
+      "created_at": "2020-08-05T13:17:00.000Z",
+      "author": "weegembump",
+      "body": "Ex beatae harum qui. Et minima qui. Molestiae quod commodi tenetur corporis id necessitatibus eum nobis. Ut dolorem eveniet. Ex dolor qui. Officia reprehenderit ducimus iure placeat.",
+      "article_id": 2
+    },
+    {
+      "comment_id": 134,
+      "votes": 7,
+      "created_at": "2020-05-04T18:21:00.000Z",
+      "author": "jessjelly",
+      "body": "Nam qui vel neque aut. Quas quos nisi. Eum praesentium quasi commodi saepe assumenda sed vel. Nostrum qui magnam aut occaecati exercitationem aut voluptatibus.",
+      "article_id": 2
+    }
+  ]
+}
+  </code>
+</pre>
+        </li>
+
+        <li class="endpoint-card">
+          <h3 id="POST articles/:article_id/comments">
+            POST /api/articles/:article_id/comments
+          </h3>
+          <p>Post a new comment under an article based on the article ID.</p>
+
+          <p>
+            To post a new comment, the body request requires two parameters,
+            username (author) and must be a valid username, and the body (the
+            text within the comment)
+          </p>
+          <pre>
+            <code>
+                {
+                    username: cooljmessy,
+                    body: Lorem ipsum dolor sit amet, consectetur adipisicing elit. Quasi possimus ut repellat delectus laudantium pariatur ipsum animi aliquid fuga ratione cum et vitae saepe, necessitatibus facilis explicabo nulla reprehenderit nisi.
+                }
+            </code>
+          </pre>
+
+          <h4>Example response for ID=2:</h4>
+          <pre>
+  <code>
+{
+	"comment_id": 301,
+	"article_id": 2,
+	"body": "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Quasi possimus ut repellat delectus laudantium pariatur ipsum animi aliquid fuga ratione cum et vitae saepe, necessitatibus facilis explicabo nulla reprehenderit nisi.",
+	"votes": 0,
+	"author": "cooljmessy",
+	"created_at": "2026-02-10T14:23:49.423Z"
+}
+  </code>
+</pre>
+
+          <p>
+            The response from the server returns a formatted comment, with all
+            the required properties.
+          </p>
+        </li>
+
+        <li class="endpoint-card">
+          <h3 id="PATCH articles/:article_id">
+            PATCH /api/articles/:article_id
+          </h3>
+          <p>Update the number of votes under an article based on its ID.</p>
+
+          <h4>Example response for ID=2:</h4>
+          <pre>
+  <code>
+
+  </code>
+</pre>
+        </li>
+
+        <li class="endpoint-card">
+          <h3 id="DELETE articles/comments/:comment_id">
+            DELETE /api/comments/:comment_id
+          </h3>
+          <p>Delete a comment based on the comment ID.</p>
+
+          <h4>Example response for ID=2:</h4>
+          <pre>
+  <code>
+
+  </code>
+</pre>
+        </li>
+      </ul>
+    </main>
+    <footer>
+      <p>Github:</p>
+      <a href="https://github.com/yerayafonso"
+        ><img
+          class="footer-img"
+          src="../GitHub_Invertocat_Black.svg"
+          alt="GitHub logo"
+      /></a>
+    </footer>
+  </body>
+</html>

@@ -540,3 +540,55 @@ describe("/api/emojis", () => {
       });
   });
 });
+
+describe("PATCH /api/comment/:comment_id", () => {
+  test("200: Responds with the updated comment object for increase in votes", async () => {
+    const currentVotes = await db.query(
+      `SELECT votes FROM comments WHERE comment_id=3`,
+    );
+
+    const voteObject = { inc_votes: 35 };
+
+    return request(app)
+      .patch("/api/comments/3")
+      .send(voteObject)
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.votes).toBeNumber();
+        expect(body.votes).toBe(
+          currentVotes.rows[0].votes + voteObject.inc_votes,
+        );
+      });
+  });
+
+  test("200: Responds with the updated comment object for decrease in votes", async () => {
+    const currentVotes = await db.query(
+      `SELECT votes FROM comments WHERE comment_id=3`,
+    );
+
+    const voteObject = { inc_votes: -35 };
+
+    return request(app)
+      .patch("/api/comments/3")
+      .send(voteObject)
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.votes).toBeNumber();
+        expect(body.votes).toBe(
+          currentVotes.rows[0].votes + voteObject.inc_votes,
+        );
+      });
+  });
+
+  test("404: Responds with error message", () => {
+    return request(app)
+      .patch("/api/comments/200")
+      .send({
+        inc_votes: 35,
+      })
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.msg).toBe("ID not found");
+      });
+  });
+});
