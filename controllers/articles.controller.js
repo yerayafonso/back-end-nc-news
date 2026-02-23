@@ -4,6 +4,7 @@ const {
   getArticleByIdComments: getArticleByIdCommentsService,
   postArticleByIdComments: postArticleByIdCommentsService,
   patchArticleById: patchArticleByIdService,
+  postArticle: postArticleService,
 } = require("../service/articles.service");
 const InvalidType = require("../errors/InvalidType");
 const InvalidQuery = require("../errors/InvalidQuery");
@@ -66,6 +67,23 @@ exports.postArticleByIdComments = (req, res, next) => {
       res.status(201).send(comments);
     })
     .catch((err) => {
+      next(err);
+    });
+};
+
+exports.postArticle = (req, res, next) => {
+  const { author, title, body, topic, article_img_url } = req.body;
+
+  if (!author || !title || !body || !topic) {
+    throw new InvalidQuery("Missing property");
+  }
+
+  postArticleService(author, title, body, topic, article_img_url)
+    .then((article) => {
+      res.status(201).send(article);
+    })
+    .catch((err) => {
+      console.error(err);
       next(err);
     });
 };

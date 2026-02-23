@@ -119,6 +119,28 @@ exports.postNewArticleByIdComments = (article_id, username, body) => {
     .then(({ rows }) => rows[0]);
 };
 
+exports.postNewArticle = (
+  author,
+  title,
+  body,
+  topic,
+  article_img_url = "../article_img_default.webp",
+) => {
+  return db
+    .query(
+      `INSERT INTO articles(
+  author,
+  title,
+  body,
+  topic,
+  article_img_url)
+      VALUES ($1, $2, $3, $4, $5)
+      RETURNING *;`,
+      [author, title, body, topic, article_img_url],
+    )
+    .then(({ rows }) => rows[0]);
+};
+
 exports.patchArticlePropertyById = (article_id, inc_votes) => {
   return db
     .query(

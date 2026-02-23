@@ -6,6 +6,7 @@ const {
   patchArticlePropertyById,
   checkArticleExists,
   checkArticleTopicsExists,
+  postNewArticle,
 } = require("../models/articles.model");
 const NotFoundError = require("../errors/NotFoundError");
 const InvalidQuery = require("../errors/InvalidQuery");
@@ -63,6 +64,21 @@ exports.postArticleByIdComments = (article_id, username, body) => {
       }
     })
     .catch((err) => {
+      throw new NotFoundError("Article ID/User not found");
+    });
+};
+
+exports.postArticle = (author, title, body, topic, article_img_url) => {
+  return postNewArticle(author, title, body, topic, article_img_url)
+    .then((article) => {
+      if (!article) {
+        throw new NotFoundError("ID not found");
+      } else {
+        return article;
+      }
+    })
+    .catch((err) => {
+      console.error(err);
       throw new NotFoundError("Article ID/User not found");
     });
 };

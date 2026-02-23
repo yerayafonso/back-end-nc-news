@@ -21,7 +21,7 @@ describe("Invalid endpoint", () => {
 
 describe("Invalid Methods", () => {
   test("405: Responds with error message for invalid method on /api/articles", () => {
-    const invalidMethods = ["delete", "post", "patch"];
+    const invalidMethods = ["delete", "patch"];
 
     const requests = invalidMethods.map((method) => {
       return request(app)
@@ -418,6 +418,95 @@ describe("POST /api/articles/:article_id/comments", () => {
       });
   });
 });
+
+describe("POST /api/articles/", () => {
+  test("201: Responds with the new article object", () => {
+    return request(app)
+      .post("/api/articles")
+      .send({
+        author: "butter_bridge",
+        title: "Title",
+        body: "Random text",
+        topic: "paper",
+        article_img_url: "../GitHub_Invertocat_Black.svg", ///finish thissss!!!!
+      })
+      .expect(201)
+      .then(({ body }) => {
+        console.log(body);
+        expect(body.article_id).toBeNumber();
+        expect(body.votes).toBeNumber();
+        expect(body.created_at).toBeString();
+        expect(body.author).toBe("butter_bridge");
+        expect(body.body).toBe("Random text");
+        // expect(body.commment_count).toBeNumber();
+      });
+  });
+
+  test("201: Responds with the new article object and ignores additional properties", () => {
+    return request(app)
+      .post("/api/articles")
+      .send({
+        author: "butter_bridge",
+        title: "Title",
+        body: "Random text",
+        topic: "paper",
+        article_img_url: "../GitHub_Invertocat_Black.svg",
+        votes: 99,
+      })
+      .expect(201)
+      .then(({ body }) => {
+        expect(body.votes).toBe(0);
+        expect(body.created_at).toBeString();
+        expect(body.author).toBeString();
+        expect(body.body).toBeString();
+        expect(body.article_id).toBeNumber();
+      });
+  });
+
+  test("201: Responds with the new article object and avatar url defaults", () => {
+    return request(app)
+      .post("/api/articles")
+      .send({
+        author: "butter_bridge",
+        title: "Title",
+        body: "Random text",
+        topic: "mitch",
+      })
+      .expect(201)
+      .then(({ body }) => {
+        console.log(body);
+        expect(body.article_img_url).toBe("../article_img_default.webp");
+      });
+  });
+
+  test("400 - Responds with error message for missing property", () => {
+    return request(app)
+      .post("/api/articles")
+      .send({
+        body: "Random text",
+      })
+      .expect(400)
+      .then(({ body }) => {
+        expect(body).toEqual({ msg: "Missing property" });
+      });
+  });
+
+  test("404 - Responds with error message for invalid foreign-key values", () => {
+    return request(app)
+      .post("/api/articles")
+      .send({
+        username: "trollUser",
+        title: "Title",
+        body: "Random text",
+        topic: "paper",
+      })
+      .expect(400)
+      .then(({ body }) => {
+        expect(body).toEqual({ msg: "Missing property" });
+      });
+  });
+});
+// ////
 
 describe("PATCH /api/articles/:article_id", () => {
   test("200: Responds with the updated article object for increase in votes", async () => {

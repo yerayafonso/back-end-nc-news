@@ -5,12 +5,17 @@ const {
   getArticleByIdComments,
   postArticleByIdComments,
   patchArticleById,
+  postArticle,
 } = require("../controllers/articles.controller");
 const handleInvalidMethods = require("../errors/handleInvalidMethods");
 
 const articlesRouter = express.Router();
 
-articlesRouter.route("/").get(getAllArticles).all(handleInvalidMethods);
+articlesRouter
+  .route("/")
+  .get(getAllArticles)
+  .post(postArticle)
+  .all(handleInvalidMethods);
 
 articlesRouter
   .route("/:article_id")
@@ -18,8 +23,10 @@ articlesRouter
   .patch(patchArticleById)
   .all(handleInvalidMethods);
 
-articlesRouter.get("/:article_id/comments", getArticleByIdComments);
-
-articlesRouter.post("/:article_id/comments", postArticleByIdComments);
+articlesRouter
+  .route("/:article_id/comments")
+  .get(getArticleByIdComments)
+  .post(postArticleByIdComments)
+  .all(handleInvalidMethods);
 
 module.exports = articlesRouter;
