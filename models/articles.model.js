@@ -76,6 +76,7 @@ exports.fetchArticleById = (article_id) => {
       articles.topic, 
       articles.created_at, 
       articles.votes, 
+      articles.body,
       articles.article_img_url, 
       CAST(COUNT(comments.article_id) AS INT) comment_count
       FROM articles 
