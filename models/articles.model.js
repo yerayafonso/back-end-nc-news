@@ -10,6 +10,7 @@ exports.fetchAllArticles = (sort_by = "created_at", order = "DESC", topic) => {
     "created_at",
     "votes",
     "avatar_img_url",
+    "comment_count",
   ];
   const validOrderQuery = ["ASC", "DESC"];
 
