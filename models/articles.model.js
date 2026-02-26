@@ -21,6 +21,10 @@ exports.fetchAllArticles = (sort_by = "created_at", order = "DESC", topic) => {
   if (!validOrderQuery.includes(order.toUpperCase())) {
     throw new InvalidQuery("Invalid Query");
   }
+
+  const sortColumn =
+    sort_by === "comment_count" ? "comment_count" : `articles.${sort_by}`;
+
   if (topic) {
     return db
       .query(
@@ -38,7 +42,7 @@ exports.fetchAllArticles = (sort_by = "created_at", order = "DESC", topic) => {
       ON articles.article_id = comments.article_id 
       WHERE articles.topic= $1
       GROUP BY articles.article_id
-      ORDER BY articles.${sort_by} ${order.toUpperCase()};`,
+      ORDER BY ${sortColumn} ${order.toUpperCase()};`,
         [topic],
       )
       .then(({ rows }) => {
@@ -61,7 +65,7 @@ exports.fetchAllArticles = (sort_by = "created_at", order = "DESC", topic) => {
       LEFT JOIN comments 
       ON articles.article_id = comments.article_id 
       GROUP BY articles.article_id
-      ORDER BY articles.${sort_by} ${order.toUpperCase()};`,
+      ORDER BY ${sortColumn} ${order.toUpperCase()};`,
       )
       .then(({ rows }) => rows);
   }
