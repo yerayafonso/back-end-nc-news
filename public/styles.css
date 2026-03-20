@@ -6,7 +6,7 @@
 body {
   font-family: Arial, Helvetica, sans-serif;
   margin: 0;
-  background-color: #f4f4f4;
+  background-color: #f9f3db;
   color: #333;
   /* display: grid;
   grid-template-columns: 10vw auto;
@@ -104,7 +104,7 @@ li {
 } */
 
 .endpoint-card {
-  background-color: #dbf5d4;
+  background-color: #d4e5f5;
   border: 2px solid red;
   border-radius: 10px;
 
@@ -115,7 +115,7 @@ li {
 main {
   border: 2px solid red;
   margin-left: 350px;
-  max-width: 75vw;
+  max-width: 70vw;
   width: 100%;
   align-items: center;
   overflow: hidden;
