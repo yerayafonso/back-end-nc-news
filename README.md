@@ -1,6 +1,6 @@
 # NC News
 
-Link to hoseted version: https://nc-news-app-5h3i.onrender.com/
+Link to hosted version: https://nc-news-app-5h3i.onrender.com/api/
 
 ## Summary
 
@@ -29,11 +29,6 @@ Once the repository has been cloned, in the terminal at the root of the director
 npm install
 ```
 
-To edit and test the code, devDependencies are required, and that can be installed using
-
-```
-npm install --dev
-```
 
 ## Create .env files
 
